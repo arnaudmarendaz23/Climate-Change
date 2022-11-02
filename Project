@@ -1,0 +1,96 @@
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+population <- read.csv("world_population.csv")
+GDP <- read.csv("world_country_gdp_usd.csv")
+meatconsumption <- read.csv("meat_consumption.csv")
+unemployment <- read.csv("inflation interest unemployment.csv")
+lifeexpecatncy <- read.csv("Life Expectancy Data.csv")
+temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
+costofliving <- read.csv("costofliving.csv")
+CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
+
+attach(temperatures)
+head(temperatures)
+temperatures["dt"]
+temp <- as.tbl(temperatures)
+dt <- as.Date(dt)
+temp <- select(temperatures, dt, AverageTemperature, Country)
+temp[is.na(temp)] = 0
+temp$year <- format(as.Date(temp$dt, format="%Y-%d-%m"),"%Y")
+flemme <- select(temp, year, Country, AverageTemperature)
+flemme
+
+warming <- flemme %>%
+  group_by(year, Country) %>%
+  summarize((mean=mean(AverageTemperature)))
+period <- filter(warming, year >= 1960)
+
+
+france_temp <- filter(period, Country == "France")
+france_temp
+colnames(france_temp) = c("Years", "Countries", "Average_Temperature")
+france_temp
+france_temp[1] <- apply(france_temp[1], 2, as.numeric)
+ggplot(data = france_temp, mapping = aes(x = Years, y = Average_Temperature)) +
+  geom_point() +
+  geom_smooth()
+
+
+attach(CO2_emissions)
+emission <- as.tbl(CO2_emissions)
+head(emission)
+colnames(emission) <- c("Countries", 1960:2018)
+years <- as.character(1960:2018)
+emission_clean <- emission %>%
+  pivot_longer(years, names_to = "years", values_to = "CO2")
+emission_clean
+
+france_co2 <- filter(emission_clean, Countries == "France")
+france_co2[2] <- apply(france_co2[2], 2, as.numeric)
+france_co2
+
+ggplot(data = france_co2, mapping = aes(x = years, y = CO2), color="blue", main = "Quantity of CO2 per year in France") +
+  geom_point() +
+  geom_smooth()
+
+# _______________________________________________________________________________________________________________________
+
+brazil_co2 <- filter(emission_clean, Countries == "Brazil")
+brazil_co2[2] <- apply(brazil_co2[2], 2, as.numeric)
+brazil_co2
+
+ggplot(data = brazil_co2, mapping = aes(x = years, y = CO2), color="blue") +
+  geom_point() +
+  geom_smooth()
+
+#_________________________________________________________________________________________________________________________
+
+sa_co2 <- filter(emission_clean, Countries == "South Africa")
+sa_co2[2] <- apply(sa_co2[2], 2, as.numeric)
+sa_co2
+
+ggplot(data = sa_co2, mapping = aes(x = years, y = CO2), color="blue") +
+  geom_point() +
+  geom_smooth()
+#___________________________________________________________________________________________________________________________
+sk_co2 <- filter(emission_clean, Countries == "Korea, Dem. People's Rep.")
+sk_co2[2] <- apply(sk_co2[2], 2, as.numeric)
+sk_co2
+
+ggplot(data = sk_co2, mapping = aes(x = years, y = CO2), color="blue") +
+  geom_point() +
+  geom_smooth()
+    
+#_______________________________________________________________________________________________________________________
+egypt_co2 <- filter(emission_clean, Countries == "Egypt, Arab Rep.")
+egypt_co2[2] <- apply(egypt_co2[2], 2, as.numeric)
+egypt_co2
+
+ggplot(data = egypt_co2, mapping = aes(x = years, y = CO2), color="blue") +
+  geom_point() +
+  geom_smooth()
+    
