@@ -1,7 +1,7 @@
 #                       Data Science Project
 
 
-#First, we have import the different library needed for our project
+    #First, we have import the different library needed for our project
 library(dplyr)
 library(tidyr)
 library(tidyverse)
@@ -9,8 +9,8 @@ library(ggplot2)
 library(lubridate)
 --------------------------------------------------------------------------------
   
-#then, we begin by importing the different datasets in our R software and this will
-#save them into different variable of type dataframe.
+    #then, we begin by importing the different datasets in our R software and this will
+    #save them into different variable of type dataframe.
 population <- read.csv("world_population.csv")
 GDP <- read.csv("world_country_gdp_usd.csv")
 meatconsumption <- read.csv("meat_consumption.csv")
@@ -20,70 +20,87 @@ temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
 costofliving <- read.csv("costofliving.csv")
 CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
 --------------------------------------------------------------------------------
-
-#Now we can begin with tydying the first dataset, namely the temperatures dataset
-#we first print the dataset in order to know how it looks like
+#                           Dataset 1: Temperatures
+  
+    #Now we can begin with tydying the first dataset, namely the temperatures dataset
+    #we first print the dataset in order to know how it looks like
 attach(temperatures)
 head(temperatures)
-#then, this is of type dataframe, so we have to transform it into a tibble
+
+    #then, this is of type dataframe, so we have to transform it into a tibble
 temperatures["dt"]
 temp <- as.tbl(temperatures)
 
-#now, to be able to visualize late, we have to make the date column into datatype
-#date. 
+    #now, to be able to visualize late, we have to make the date column into datatype
+    #date. 
 dt <- as.Date(dt)
 
-#we select only the columns that are useful for our project
+    #we select only the columns that are useful for our project
 temp <- select(temperatures, dt, AverageTemperature, Country)
 
-#we replace the NA value by 0 because we have to compute the mean
-#after, so with one NA it will gives us NA.
+    #we replace the NA value by 0 because we have to compute the mean
+    #after, so with one NA it will gives us NA.
 temp[is.na(temp)] = 0
 
-#in order to clean even more the data, we want to have only the year
-# in the date column
+    #in order to clean even more the data, we want to have only the year
+    # in the date column
 temp$year <- format(as.Date(temp$dt, format="%Y-%d-%m"),"%Y")
 
-#we reorganise a little bit our tibble
+    #we reorganise a little bit our tibble
 temperature_clean <- select(temp, year, Country, AverageTemperature)
 temperature_clean
 
-#Now, we have daily temperture. In order to analyze thid
-#we have to transform our value into yearly data, we use the following
+    #Now, we have daily temperture. In order to analyze thid
+    #we have to transform our value into yearly data, we use the following
 temp_df <- temperature_clean %>%
   group_by(year, Country) %>%
   summarize((mean=mean(AverageTemperature)))
 
-#The period we consider begin in 1960, the previous value are eliminate
+    #The period we consider begin in 1960, the previous value are eliminate
 period <- filter(temp_df, year >= 1960)
 
 --------------------------------------------------------------------------------
-#Now, let's have a look at the first Country, the Germany
-#first, we filter our cleaned dataset by selecting only the Germany
+#                       Dataset 2: CO2 Emissions
+  
+  #Now we look at a new dataset, the one with the CO2 emissions per country.
+  attach(CO2_emissions)
+
+#we transform it into a tibble
+emission <- as.tbl(CO2_emissions)
+head(emission)
+
+#then, the Year are named with an X at the beginning, so we change the colnames
+colnames(emission) <- c("Countries", 1960:2018)
+
+#to do it, we have to transform they numbe into character
+years <- as.character(1960:2018)
+
+#Now, we want to have a column with the different year, in order to have this, we do:
+emission_clean <- emission %>%
+  pivot_longer(years, names_to = "Years", values_to = "CO2")
+emission_clean
+
+--------------------------------------------------------------------------------
+                          #Germany
+  
+  #Now, let's have a look at the first Country, the Germany
+    #first, we filter our cleaned dataset by selecting only the Germany
 germany_temp <- filter(period, Country == "Germany")
 germany_temp
 
-#then, we rename the column
+    #then, we rename the column
 colnames(germany_temp) = c("Years", "Countries", "Average_Temperature")
 germany_temp
 
-#in order to visualize, the current column Years is of type chr, we have to 
-#transform into a numeric
+    #in order to visualize, the current column Years is of type chr, we have to 
+    #transform into a numeric
 germany_temp[1] <- apply(germany_temp[1], 2, as.numeric)
 ggplot(data = germany_temp, mapping = aes(x = Years, y = Average_Temperature)) +
   geom_point() +
   geom_smooth()
 
 
-attach(CO2_emissions)
-emission <- as.tbl(CO2_emissions)
-head(emission)
-colnames(emission) <- c("Countries", 1960:2018)
-years <- as.character(1960:2018)
-emission_clean <- emission %>%
-  pivot_longer(years, names_to = "Years", values_to = "CO2")
-emission_clean
-
+#
 france_co2 <- filter(emission_clean, Countries == "France")
 france_co2[2] <- apply(france_co2[2], 2, as.numeric)
 france_co2
