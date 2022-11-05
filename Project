@@ -1,4 +1,4 @@
-#                       Data Science Project
+#                       Data Science Project Commented Version 1.11.2022 (see below for new version)
 
 
     #First, we have import the different library needed for our project
@@ -147,4 +147,183 @@ egypt_co2
 ggplot(data = egypt_co2, mapping = aes(x = years, y = CO2), color="blue") +
   geom_point() +
   geom_smooth()
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  						NEW VERSION 5.11.2022 NO COMMENt
+  
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+  population <- read.csv("TotalPopulationBySex.csv")
+  GDP <- read.csv("world_country_gdp_usd.csv")
+  meatconsumption <- read.csv("meat_consumption.csv")
+  unemployment <- read.csv("inflation interest unemployment.csv")
+  lifeexpecatncy <- read.csv("Life Expectancy Data.csv")
+  temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
+  costofliving <- read.csv("costofliving.csv")
+  CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
+  
+#______________________________________________________________________________________________________________________________________________
+#                                          General Models
+  
+  attach(temperatures)
+  head(temperatures)
+  temperatures["dt"]
+  temp <- as.tbl(temperatures)
+  dt <- as.Date(dt)
+  temp <- select(temperatures, dt, AverageTemperature, Country)
+  temp[is.na(temp)] = 0
+  temp$year <- format(as.Date(temp$dt, format="%Y-%d-%m"),"%Y")
+  temperature_clean <- select(temp, year, Country, AverageTemperature)
+  temperature_clean
+  temp_df <- temperature_clean %>%
+    group_by(year, Country) %>%
+    summarize((mean=mean(AverageTemperature)))
+  period <- filter(temp_df, year >= 1960)
+  colnames(period) = c("Years", "Countries", "Average_Temperature")
+  period[1] <- apply(period[1], 2, as.numeric)
+  period
+  
+  
+  
+  attach(CO2_emissions)
+  emission <- as.tbl(CO2_emissions)
+  head(emission)
+  colnames(emission) <- c("Countries", 1960:2018)
+  years <- as.character(1960:2018)
+  emission_clean <- emission %>%
+    pivot_longer(years, names_to = "Years", values_to = "CO2")
+  emission_clean[2] <- apply(emission_clean[2], 2, as.numeric)
+  emission_clean
+  
+  
+  
+  GDP_clean <- select(GDP, Country.Name, year, GDP_USD)
+  colnames(GDP_clean) <- c("Countries", "Years", "GDP")
+  GDP_tbl <- as.tbl(GDP_clean)
+  GDP_tbl[is.na(GDP_tbl)] = 0
+  GDP_tbl
+  
+  
+  
+  unemployment_clean <- select(unemployment, country, year, Unemployment..total....of.total.labor.force...national.estimate.)
+  colnames(unemployment_clean) <- c("Countries", "Years", "Unemployment_rate")
+  unemployment_tbl <- as.tbl(unemployment_clean)
+  unemployment_tbl[is.na(unemployment_tbl)] = 0
+  unemployment_tbl
+  
+  
+  
+  "Finland" %in% population$Location
+  population_clean <- select(population, Location, Time, PopTotal)
+  colnames(population_clean) <- c("Countries", "Years", "Population")
+  population_tbl1 <- as.tbl(population_clean)
+  population_tbl1[is.na(population_tbl1)] = 0
+  populations_tbl <- filter(population_tbl1, Years <= 2022)
+  populations_tbl
+  
+  
+  lifeexpecatncy_filtered <- select(lifeexpecatncy, Country, Year, Life.expectancy)
+  colnames(lifeexpecatncy_filtered) <- c("Countries", "Years", "Life_expectancy")
+  lifeexpectancy_tbl <- as.tbl(lifeexpecatncy_filtered)
+  lifeexpectancy_tbl[is.na(lifeexpectancy_tbl)] = 0
+  lifeexpectancy_tbl
+  
+  
+ __________________________________________________________________________________________________________________________________________ 
+ ##                                                   Example 1 : Finland
+    
+  
+  finland_temp <- filter(period, Countries == "Finland")
+  ggplot(data = finland_temp, mapping = aes(x = Years, y = Average_Temperature)) +
+    geom_point() +
+    geom_smooth()
+  
+  finland_co2 <- filter(emission_clean, Countries == "Finland")
+  ggplot(data = finland_co2, mapping = aes(x = Years, y = CO2), color="blue") +
+    geom_point() +
+    geom_smooth()
+  
+  finland_GDP <- filter(GDP_tbl, Countries == "Finland")
+  ggplot(data = finland_GDP, mapping = aes(x = Years, y = GDP)) +
+    geom_point() +
+    geom_smooth()
+  
+  finland_unemployment <- filter(unemployment_tbl, Countries == "Finland")
+  ggplot(data = finland_unemployment, mapping = aes(x = Years, y = Unemployment_rate)) +
+    geom_point() +
+    geom_smooth()
+  
+  finland_population <- filter(populations_tbl, Countries == "Finland")
+  finland_population
+  ggplot(data = finland_population, mapping = aes(x = Years, y = Population)) +
+    geom_point() +
+    geom_smooth()
+  
+  finland_lifeexpectancy <- filter(lifeexpectancy_tbl, Countries == "Finland")
+  ggplot(data = finland_lifeexpectancy, mapping = aes(x = Years, y = Life_expectancy)) +
+    geom_point() +
+    geom_smooth()
+  
+  finland_co2_temp <- merge(finland_co2, finland_temp, by=c("Countries", "Years"))
+  finland_co2_temp_GDP <- merge(finland_co2_temp, finland_GDP,by=c("Countries", "Years"))
+  finland_co2_temp_GDP_unemployment <- merge(finland_co2_temp_GDP, finland_unemployment, by=c("Countries", "Years"))
+  finland_co2_temp_GDP_unemployment_population <- merge(finland_co2_temp_GDP_unemployment, finland_population, by=c("Countries", "Years"))
+  finland_co2_temp_GDP_unemployment_population
+  
+  
+  
+  finland_co2_temp_GDP_lifeexpectancy <- merge(finland_co2_temp_GDP, finland_lifeexpectancy,by=c("Countries", "Years"))
+  finland_co2_temp_GDP_lifeexpectancy
+  
+  # _______________________________________________________________________________________________________________________
+  
+  brazil_co2 <- filter(emission_clean, Countries == "Brazil")
+  brazil_co2[2] <- apply(brazil_co2[2], 2, as.numeric)
+  brazil_co2
+  
+  ggplot(data = brazil_co2, mapping = aes(x = years, y = CO2), color="blue") +
+    geom_point() +
+    geom_smooth()
+  
+  #_________________________________________________________________________________________________________________________
+  
+  sa_co2 <- filter(emission_clean, Countries == "South Africa")
+  sa_co2[2] <- apply(sa_co2[2], 2, as.numeric)
+  sa_co2
+  
+  ggplot(data = sa_co2, mapping = aes(x = years, y = CO2), color="blue") +
+    geom_point() +
+    geom_smooth()
+  #___________________________________________________________________________________________________________________________
+  sk_co2 <- filter(emission_clean, Countries == "Korea, Dem. People's Rep.")
+  sk_co2[2] <- apply(sk_co2[2], 2, as.numeric)
+  sk_co2
+  
+  ggplot(data = sk_co2, mapping = aes(x = years, y = CO2), color="blue") +
+    geom_point() +
+    geom_smooth()
+  
+  #_______________________________________________________________________________________________________________________
+  egypt_co2 <- filter(emission_clean, Countries == "Egypt, Arab Rep.")
+  egypt_co2[2] <- apply(egypt_co2[2], 2, as.numeric)
+  egypt_co2
+  
+  ggplot(data = egypt_co2, mapping = aes(x = years, y = CO2), color="blue") +
+    geom_point() +
+    geom_smooth()
     
