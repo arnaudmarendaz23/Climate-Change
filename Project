@@ -156,11 +156,9 @@ ggplot(data = egypt_co2, mapping = aes(x = years, y = CO2), color="blue") +
   
   
   
+                                        NEW VERSION 05.11.2022
   
   
-  
-  
-  						NEW VERSION 5.11.2022 NO COMMENt
   
 library(dplyr)
 library(tidyr)
@@ -176,9 +174,9 @@ library(lubridate)
   temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
   costofliving <- read.csv("costofliving.csv")
   CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
+  urban_population <- read.csv2("Data urban population.csv")
   
-#______________________________________________________________________________________________________________________________________________
-#                                          General Models
+
   
   attach(temperatures)
   head(temperatures)
@@ -237,6 +235,21 @@ library(lubridate)
   populations_tbl
   
   
+  urban_population
+  urban_population_clean <- urban_population[, -which(names(urban_population) == "Country.code" |names(urban_population) == "Note" | names(urban_population) == "Index") ]
+  urban_population_clean
+  colnames(urban_population_clean) <- c("Countries", 1950:2050)
+  urban_population_tbl <- as.tbl(urban_population_clean)
+  years <- as.character(1950:2050)
+  urban_population_cleaned1 <- urban_population_tbl %>%
+    pivot_longer(years, names_to = "Years", values_to = "Urban_population")
+  urban_population_cleaned1[2] <- apply(urban_population_cleaned1[2], 2, as.numeric)
+  urban_population_cleaned2 <- filter(urban_population_cleaned1, Years <= 2022)
+  urban_population_cleaned <- filter(urban_population_cleaned2, Years >= 1960)
+  urban_population_cleaned
+  
+  
+  
   lifeexpecatncy_filtered <- select(lifeexpecatncy, Country, Year, Life.expectancy)
   colnames(lifeexpecatncy_filtered) <- c("Countries", "Years", "Life_expectancy")
   lifeexpectancy_tbl <- as.tbl(lifeexpecatncy_filtered)
@@ -244,9 +257,13 @@ library(lubridate)
   lifeexpectancy_tbl
   
   
- __________________________________________________________________________________________________________________________________________ 
- ##                                                   Example 1 : Finland
-    
+ 
+  
+   
+  
+  
+  
+  
   
   finland_temp <- filter(period, Countries == "Finland")
   ggplot(data = finland_temp, mapping = aes(x = Years, y = Average_Temperature)) +
@@ -274,6 +291,12 @@ library(lubridate)
     geom_point() +
     geom_smooth()
   
+  finland_urban_population <- filter(urban_population_cleaned, Countries == "Finland")
+  finland_urban_population
+  ggplot(data = finland_urban_population, mapping = aes(x = Years, y = Urban_population)) +
+    geom_point() +
+    geom_smooth()
+  
   finland_lifeexpectancy <- filter(lifeexpectancy_tbl, Countries == "Finland")
   ggplot(data = finland_lifeexpectancy, mapping = aes(x = Years, y = Life_expectancy)) +
     geom_point() +
@@ -283,12 +306,15 @@ library(lubridate)
   finland_co2_temp_GDP <- merge(finland_co2_temp, finland_GDP,by=c("Countries", "Years"))
   finland_co2_temp_GDP_unemployment <- merge(finland_co2_temp_GDP, finland_unemployment, by=c("Countries", "Years"))
   finland_co2_temp_GDP_unemployment_population <- merge(finland_co2_temp_GDP_unemployment, finland_population, by=c("Countries", "Years"))
-  finland_co2_temp_GDP_unemployment_population
-  
+  finland_co2_temp_GDP_unemployment_population_urban_population <- merge(finland_co2_temp_GDP_unemployment_population, finland_urban_population,  by=c("Countries", "Years"))
+  finland_co2_temp_GDP_unemployment_population_urban_population
   
   
   finland_co2_temp_GDP_lifeexpectancy <- merge(finland_co2_temp_GDP, finland_lifeexpectancy,by=c("Countries", "Years"))
   finland_co2_temp_GDP_lifeexpectancy
+  
+  
+  
   
   # _______________________________________________________________________________________________________________________
   
@@ -326,4 +352,3 @@ library(lubridate)
   ggplot(data = egypt_co2, mapping = aes(x = years, y = CO2), color="blue") +
     geom_point() +
     geom_smooth()
-    
