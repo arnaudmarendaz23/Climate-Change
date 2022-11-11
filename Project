@@ -1,3 +1,4 @@
+
 --- 
 title: "The origin, effects and differences of the local temperature evolution"
 author: "by Mohammad Fajer Elyas, Solenn Sangi and Arnaud Marendaz"
@@ -64,18 +65,18 @@ The Carbon Almanac. (2022). It's not too late. New York: Penguin.
 
 ## 1.3. Research questions
 
-- **Descriptive statistic**
-Is there a global warming for each selected country from 1970 to 2013?
-How have the emissions of CO2 for each selected country changed from 1970 to 2013?
-How is the correlation between the emissions and the warming for each selected country?
-Is the difference in temperature more interesting than the raw average temperature by year ?
-Is there a kind of inertia relationship between CO2 emissions and temperatures ? 
+* **Descriptive statistic**
+  + Is there a global warming for each selected country from 1970 to 2013?
+  + How have the emissions of CO2 for each selected country changed from 1970 to 2013?
+  + How is the correlation between the emissions and the warming for each selected country?
+  + Is the difference in temperature more interesting than the raw average temperature by year ?
+  + Is there a kind of inertia relationship between CO2 emissions and temperatures ? 
 
-- **Inferential statistic**
-What are the factors (economical, environmental or social) that impact/explain the most the emissions, hence the global warming?
-In relation to the question 2.1, are the north countries more impacted ?
-Can we observed with the data what G. Thunberg explains in her book, the reduction of CO2 emission in some countries due to outsourcing or delocalization?
-Finally, is there an increase in death in the country affected by increased severe temperatures ?
+* **Inferential statistic**
+  + What are the factors (economical, environmental or social) that impact/explain the most the emissions, hence the global warming?
+  + In relation to the question 2.1, are the north countries more impacted ?
+  + Can we observed with the data what G. Thunberg explains in her book, the reduction of CO2 emission in some countries due to outsourcing or delocalization?
+  + Finally, is there an increase in death in the country affected by increased severe temperatures ?
 
 
 
@@ -83,7 +84,7 @@ Finally, is there an increase in death in the country affected by increased seve
 
 # 2. Data
 
-## 2.1. Data Set of Global and local warming (raw)
+## 2.1. Data Set of Global warming (raw)
 
 First, we are going to take the **library** that we are going to use in this project. this will help us performing some complex statistic calculation or help us cleaning the data. At the same time, let us upload our data from the various datasets defined previously and store them into variables.
 ```{r results=FALSE, message=FALSE, warning=FALSE}
@@ -94,6 +95,7 @@ library(lubridate)
 library(car)
 library(kableExtra)
 library(xtable)
+library(patchwork)
   population <- read.csv("TotalPopulationBySex.csv")
   GDP <- read.csv("world_country_gdp_usd.csv")
   unemployment <- read.csv("inflation interest unemployment.csv")
@@ -138,10 +140,31 @@ kbl(cbind(head(CO2_emissions))) %>%
   scroll_box(width = "560px", height = "260px")
 ```
 
-### 2.1.3. GDP
+### 2.1.4. Delta Temperatures
+This dataset show the difference between the average temperature of the period 1960-1980 and the current year temperature. This difference can be positive if this year has been warmer than the selected referential, or negative if it has been colder.
+
+[Kaggle - Data set of differential temperatures](https://www.kaggle.com/datasets/sevgisarac/temperature-change?resource=download)
+```{r}
+data2 <- data.frame(Variables = c('Area Code','Area', 'Months Code','Months','Element Code','Element','Unit','Y1961','Y1962','YXXXX'), Meaning = c("The numerical code of area column.", "Countries and Territories (190 countries and 37 other territories).", 'The numerical code of months column.', 'Months, Seasons, Meteorological year.', 'The numerical code of element column.', "'Temperature change', 'Standard Deviation'.", "Celsius degrees °C, type of unit is an object.", "Year 1961", "Year 1962", "Year XXXX"))
+data2
+```
+
+```{r}
+kbl(cbind(head(deltatemp))) %>%
+  kable_paper() %>%
+  scroll_box(width = "560px", height = "260px")
+````
+
+## 2.2. Data set of local warming (raw)
+### 2.2.1. GDP
 This dataset shows the evolution of GDP per country per year in $.
+
 [Kaggle - GDP dataset](https://www.kaggle.com/datasets/tmishinev/world-country-gdp-19602021)
 
+```{r}
+data3 <- data.frame(Variables = c('Country Name','Country Code', 'Year','GDP_USD','GDP_percapita_USD'), Meaning = c("Full name of the Country", "3 letter code", "Int value of the year", "total yearly GDP for the country in USD", "GDP per capita in USD"))
+data3
+```
 
 ```{r}
 kbl(cbind(head(GDP))) %>%
@@ -151,8 +174,13 @@ kbl(cbind(head(GDP))) %>%
 
 
 ### 2.1.4. Unemployment
+This data set shows historical inflation, interest and unemployment rates by country from 1950 to 2021. Below you will find the link of the dataset, and then a table describing the different column and the top row of the raw dataset.
 
 [Kaggle - Umepmloyment dataset](https://www.kaggle.com/datasets/prasertk/inflation-interest-and-unemployment-rate)
+```{r}
+data4 <- data.frame(Variables = c('Country','Year', 'Inflation, consumer prices (annual %)','Inflation, GDP deflator (annual %)','Real interest rate (%)','Deposit interest rate (%)','Lending interest rate (%)','Unemployment, total','Unemployment, total','Iso3c'), Meaning = c("Country name", "Year", "Annual cosumer price inflation in %", "Inflation as measured by the annual growth rate", "Interest rate without inflation", "Interest rate on cash deposits of account holders in %", "Interest rate charged by lenders to borrowers in %", "Estimated numbers of national unemployed people", "Estimated numbers of national unemployed people", "ISO country code (3 characters)"))
+data4
+```
 
 ```{r}
 kbl(cbind(head(unemployment))) %>%
@@ -340,11 +368,13 @@ Now, let us merge the different dataframe we have to create one big dataframe, w
   
   kbl(cbind(df)) %>%
   kable_paper() %>%
-  scroll_box(width = "900px", height = "400px")
+  scroll_box(width = "850px", height = "400px")
 ```
 
 
 ## 2.4. Spotting mistakes
+First, we replace N.A. by 0, what could impact our results in a bad way. But then, we decided to reduce our period to limit as much as possible the existence of N.A. values. However, reducing the number of years, limit our analysis, because climate change take decades to evolve. 
+
 ## 2.5. Listing anomalies and outliers
 
 # 3. Exploratory data analysis
@@ -357,26 +387,49 @@ correl <- cor(df[-1])
 correlation <- data.frame(correl)
 kbl(cbind(correlation)) %>%
   kable_paper() %>%
-  scroll_box(width = "900px", height = "320px")
+  scroll_box(width = "850px", height = "320px")
 ```
 These correlation coefficients show that there is no variable that has a really strong relationship with the average temperatures. This seems to make sense, because the reasons why temperature move are so numerous that perhaps concentrate only on 10 variables would not be enough.
 
 Now, to confirm our first intuition, let's print a scatterplot matrix showing the relation of every variable in a visualized way.
-```{r}
-plot(df) 
+```{r, message=FALSE, warning=FALSE}
+p1 <- ggplot(df, aes(Average_Temperature, CO2)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  ggtitle(' Figure 1') 
+
+p2 <- ggplot(df, aes(deltatemperature, CO2)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  ggtitle(' Figure 2')
+
+p3 <- ggplot(df, aes(CO2, Population)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  ggtitle(' Figure 3')
+
+p4 <- ggplot(df, aes(CO2, Deaths )) + 
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  ggtitle(' Figure 4') 
+
+p1+p2+p3+p4
 ```` 
 
+Figure 1 illstrate the relationship between temperature and CO2. As illustrate the line, there seem to have a negative relation. This means that adding lowering emission will increase temperature ! This looks quite unrealsitic. But remember, actually we look at the situation in Norway and not globally. Figure 2 showst the relation between the difference in temperature and the CO2 emission. Both line shows actually quite the same trends. Therefore, we have tu evalute perhaps if there is an inertai relationship. By inertai relationship, we mean that there is a cetain amount of year that pass before we see the impact of CO2 emission on Climate change. 
+
+Then, let's create a linearmodel with all the values, despite the bad intuition, let's look what statistics say.
 ```{r}
 linear_model <- lm(data = df, Average_Temperature ~ CO2 + GDP + Unemployment_rate + Population + Urban_population + Deaths + InfantsDeaths+ latitude + longitude)
-  summary(linear_model)
+summary(linear_model)
 ```
 
-
+Then, we prepare a backward selection base on AIEC criteria, to evaluate which variable should we keep.
 ```{r}
 null_model <- lm(data = df, Average_Temperature ~ 1)
   step(linear_model, scope=list(lower=null_model, upper=linear_model), direction="backward")
 ```
-
+It's look like for the Norway the only significant variable are GDP and InfantDeaths.
 
 ```{r}
   linear_model2 <- lm(data = df, Average_Temperature ~ GDP + InfantsDeaths)
@@ -403,3 +456,7 @@ null_model <- lm(data = df, Average_Temperature ~ 1)
 ## 5.2. Limitations
 ## 5.3. Future Work
 
+
+
+
+ 
