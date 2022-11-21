@@ -1,22 +1,21 @@
-
 --- 
-title: "The origin, effects and differences of the local temperature evolution"
+  title: "The origin, effects and differences of the local temperature evolution"
 author: "by Mohammad Fajer Elyas, Solenn Sangi and Arnaud Marendaz"
 date: "2022-11-09"
 output: 
   html_document:
-    toc: true
-    toc_float: true
-    toc_depth: 4
-    df_print: paged 
-    code_folding: hide 
+  toc: true
+toc_float: true
+toc_depth: 4
+df_print: paged 
+code_folding: hide 
 
 ---
 # Executive Summary
-
-
-- **Reasearch goal**
-This analysis's primary goal is to assess how much the rise of temperature is impacted by the emissions (of CO2). In a subsequent step, we look at what affects the emissions on CO2 and the place of humanhood in it.
+  
+  
+  - **Reasearch goal**
+  This analysis's primary goal is to assess how much the rise of temperature is impacted by the emissions (of CO2). In a subsequent step, we look at what affects the emissions on CO2 and the place of humanhood in it.
 
 - **Methodology**
 We performed our research primarily using seven data sets, each of which was relevant to one of the three pillars of sustainability, namely the economy, society, and environment. Since rising temperatures affect all three sectors, selecting factors from these several sustainability categories allowed us to accurately allocate the major causes of the changes over the previous sixty years. In order to assess that the rising of temperatures is a global problem, we had to observe the changes on a local scale in different area, thus we chose to analyse the data of ten countries spread over the five continents;  Belgium, Brazil, (Egypt), Finland, Japan, (Netherlands), South Africa, (South Korea), (USA).
@@ -64,32 +63,32 @@ The Carbon Almanac. (2022). It's not too late. New York: Penguin.
 [IPCC. (2022). Climate Change 2022.](https://www.unep.org/fr/resources/rapport/www.ipcc.ch/report/sixth-assessment-report-working-group-ii/) 
 
 $~$
-
-## 1.3. Research questions
-
-* **Descriptive statistic**
+  
+  ## 1.3. Research questions
+  
+  * **Descriptive statistic**
   + Is there a global warming for each selected country from 1970 to 2013?
   + How have the emissions of CO2 for each selected country changed from 1970 to 2013?
   + How is the correlation between the emissions and the warming for each selected country?
   + Is the difference in temperature more interesting than the raw average temperature by year ?
   + Is there a kind of inertia relationship between CO2 emissions and temperatures ? 
-
-* **Inferential statistic**
+  
+  * **Inferential statistic**
   + What are the factors (economical, environmental or social) that impact/explain the most the emissions, hence the global warming?
   + In relation to the question 2.1, are the north countries more impacted ?
   + Can we observed with the data what G. Thunberg explains in her book, the reduction of CO2 emission in some countries due to outsourcing or delocalization?
   + Finally, is there an increase in death in the country affected by increased severe temperatures ?
-
-$~$
-$~$
-$~$
-$~$
-
-
-# 2. Data
-## 2.1. Data Set of Global warming (raw)
-
-First, we are going to take the **library** that we are going to use in this project. this will help us performing some complex statistic calculation or help us cleaning the data. At the same time, let us upload our data from the various datasets defined previously and store them into variables.
+  
+  $~$
+  $~$
+  $~$
+  $~$
+  
+  
+  # 2. Data
+  ## 2.1. Data Set of Global warming (raw)
+  
+  First, we are going to take the **library** that we are going to use in this project. this will help us performing some complex statistic calculation or help us cleaning the data. At the same time, let us upload our data from the various datasets defined previously and store them into variables.
 ```{r results=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(tidyr)
@@ -101,19 +100,20 @@ library(xtable)
 library(patchwork)
 library(knitr)
 library(ggpubr)
-  population <- read.csv("TotalPopulationBySex.csv")
-  GDP <- read.csv("world_country_gdp_usd.csv")
-  unemployment <- read.csv("inflation interest unemployment.csv")
-  temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
-  CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
-  urban_population <- read.csv2("Data urban population.csv")
-  location <- read.csv("world_country_and_usa_states_latitude_and_longitude_values.csv")
-  demographic <- read.csv("demographic.csv")
-  deltatemp <- read.csv("FAOSTAT_data_1-10-2022.csv")
+population <- read.csv("TotalPopulationBySex.csv")
+GDP <- read.csv("world_country_gdp_usd.csv")
+unemployment <- read.csv("inflation interest unemployment.csv")
+temperatures <- read.csv("GlobalLandTemperaturesByCountry.csv")
+CO2_emissions <- read.csv("CO2_Emissions_1960-2018.csv")
+urban_population <- read.csv2("Data urban population.csv")
+location <- read.csv("world_country_and_usa_states_latitude_and_longitude_values.csv")
+demographic <- read.csv("demographic.csv")
+deltatemp <- read.csv("FAOSTAT_data_1-10-2022.csv")
 ```
+
 ### 2.1.1 Temperatures
 You will find below the source of this data set:
-[Kaggle - temperature change dataset.](https://www.kaggle.com/datasets/sevgisarac/temperature-change?resource=download) 
+  [Kaggle - temperature change dataset.](https://www.kaggle.com/datasets/sevgisarac/temperature-change?resource=download) 
 The temperature evolution dataset found on Kaggle explains the annual, monthly evolution of the average surface temperature in 190 countries. The time of this data is from 1960 to 2020 and the unit is degrees Celsius. Below you will find the explanation of the column, and the top rows of the raw dataset.
 ```{r table-mtcars, warning=FALSE, message=FALSE}
 data <- data.frame(Variables = c("dt","AverageTemperature", "AverageTemperatureUncertainity","Country"), Meaning = c("Checked date of the temperature", "The average daily temperature per countries ", "Error margin?", "Name of the country"))
@@ -123,9 +123,9 @@ data
 head(temperatures)
 ```
 $~$
-
-### 2.1.2. CO2 Emissions
-You will find below the source of this data set:[Kaggle - CO2 emission dataset.](https://www.kaggle.com/datasets/kkhandekar/co2-emissions-1960-2018)
+  
+  ### 2.1.2. CO2 Emissions
+  You will find below the source of this data set:[Kaggle - CO2 emission dataset.](https://www.kaggle.com/datasets/kkhandekar/co2-emissions-1960-2018)
 The CO2 emissions dataset represents the CO2 emissions per capita in kilotonne and per country over the period 1960-2018. Below you will see the description of the variable and the top row of the raw data.
 
 ```{r}
@@ -138,9 +138,9 @@ kbl(cbind(head(CO2_emissions))) %>%
   scroll_box(width = "560px", height = "260px")
 ```
 $~$
-
-### 2.1.3. Delta Temperatures
-This dataset show the difference between the average temperature of the period 1960-1980 and the current year temperature. This difference can be positive if this year has been warmer than the selected referential, or negative if it has been colder.
+  
+  ### 2.1.3. Delta Temperatures
+  This dataset show the difference between the average temperature of the period 1960-1980 and the current year temperature. This difference can be positive if this year has been warmer than the selected referential, or negative if it has been colder.
 
 [Kaggle - Data set of differential temperatures](https://www.kaggle.com/datasets/sevgisarac/temperature-change?resource=download)
 ```{r}
@@ -152,13 +152,13 @@ data2
 kbl(cbind(head(deltatemp))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-$~$
-
-## 2.2. Data set of local warming (raw)
-### 2.2.1. GDP
-This dataset shows the evolution of GDP per country per year in $.
+  $~$
+  
+  ## 2.2. Data set of local warming (raw)
+  ### 2.2.1. GDP
+  This dataset shows the evolution of GDP per country per year in $.
 
 [Kaggle - GDP dataset](https://www.kaggle.com/datasets/tmishinev/world-country-gdp-19602021)
 
@@ -171,11 +171,11 @@ data3
 kbl(cbind(head(GDP))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-
-### 2.2.2. Unemployment
-This data set shows historical inflation, interest and unemployment rates by country from 1950 to 2021. Below you will find the link of the dataset, and then a table describing the different column and the top row of the raw dataset. 
+  
+  ### 2.2.2. Unemployment
+  This data set shows historical inflation, interest and unemployment rates by country from 1950 to 2021. Below you will find the link of the dataset, and then a table describing the different column and the top row of the raw dataset. 
 
 [Kaggle - Umepmloyment dataset](https://www.kaggle.com/datasets/prasertk/inflation-interest-and-unemployment-rate)
 ```{r}
@@ -187,13 +187,13 @@ data4
 kbl(cbind(head(unemployment))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-
-### 2.2.3. Country Location
-The Country Location data set diplays the GPS coordinates for every world country and every USA state. Below you'll see the link of the Kaggle dataset and the description of the dataset. In addition, you'll see the first columns of the dataset:
-
-[Kaggle _ Latitude and Longitude dataset](https://www.kaggle.com/datasets/paultimothymooney/latitude-and-longitude-for-every-country-and-state)
+  
+  ### 2.2.3. Country Location
+  The Country Location data set diplays the GPS coordinates for every world country and every USA state. Below you'll see the link of the Kaggle dataset and the description of the dataset. In addition, you'll see the first columns of the dataset:
+  
+  [Kaggle _ Latitude and Longitude dataset](https://www.kaggle.com/datasets/paultimothymooney/latitude-and-longitude-for-every-country-and-state)
 
 ```{r}
 data5 <- data.frame(Variables = c("Country_code", "Latitude", "Longitude", "Country", "Usa_state_code", "sa_state_latitude", "Usa_state_longitude", "Usa_state"), Meaning = c("Country code", "Country latitude", "Country longitude", "Country name", "State of USA code", "State of USA Latitude", "State of USA Longitude", "State of USA name"))
@@ -203,13 +203,13 @@ data5
 kbl(cbind(head(location))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-
-### 2.2.4. Urban Populations
-This data set displays the urban Population at Mid-Year by Region, Subregion, Country and Area, from 1950 to 2050 (in thousands). It comes from the United Nation's website. Below you'll find the link of the dataset, a table explaining the variables and the first columns of the raw dataset:
-
-[United Nation - Urban Population](https://population.un.org/wup/Download/)
+  
+  ### 2.2.4. Urban Populations
+  This data set displays the urban Population at Mid-Year by Region, Subregion, Country and Area, from 1950 to 2050 (in thousands). It comes from the United Nation's website. Below you'll find the link of the dataset, a table explaining the variables and the first columns of the raw dataset:
+  
+  [United Nation - Urban Population](https://population.un.org/wup/Download/)
 
 ```{r}
 data6 <- data.frame(Variables = c("Index", "Region, subregion, country or area", "Note", "Country code", "Year"), Meaning = c("Index", "Name of the Regions, Subregions, Countries and Areas", "UN symbol linked to a location notes file", "Country numeric code", "Year"))
@@ -220,11 +220,11 @@ data6
 kbl(cbind(head(urban_population))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-
-### 2.2.5. Population 
-The population dataset shows us the population of 1970, 1980, 1990, 2000, 2010, 2020 and 2022 of the targeted countries, but also other data such as growth rate, density or area of the country that will not interest us in the framework of our project. Below you'll first see the link, and a table explaining the variables and a table with the first columns of the raw data:
+  
+  ### 2.2.5. Population 
+  The population dataset shows us the population of 1970, 1980, 1990, 2000, 2010, 2020 and 2022 of the targeted countries, but also other data such as growth rate, density or area of the country that will not interest us in the framework of our project. Below you'll first see the link, and a table explaining the variables and a table with the first columns of the raw data:
 
 [United Nations - Population dataset](https://population.un.org/wpp/Download/Standard/CSV/)
 
@@ -238,13 +238,13 @@ data7
 kbl(cbind(head(population))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
 
 ### 2.2.6. Demographic
 This data set displays the annual estimates and standard projection scenarios of all demography indicator per country from from 1950 to 2100. The main that will interest us are the number of deaths and infants deaths per year. For a volume of the data purpose, we will do a listing of the type of variables that one can find in the dataset. Below you'll first find the link of the dataset, and then a table explaining the different variables and a table showing the first rows of the raw dataset:
-
-[United Nations - Demographic Indicators Dataset](https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx)
+  
+  [United Nations - Demographic Indicators Dataset](https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx)
 
 ```{r}
 data8 <- data.frame(Variables = c("Variant", "Population", "Fertility", "Mortality", "Migration"), Meaning = c("projection scenario name (Estimates is the most used)",  "Population indicators per year per country, such as male and women ratio, median age or population growth", "Fertility indicators per year per country such as number of birth, birth by woman or total fertility rate", "Mortality indicators per year per country, such as total death, total life expectancy or infant death", "number of migration, net migration rate"))
@@ -255,57 +255,57 @@ data8
 kbl(cbind(head(demographic))) %>%
   kable_paper() %>%
   scroll_box(width = "560px", height = "260px")
-````
+```
 $~$
-$~$
-
-## 2.3. Cleaining the data
+  $~$
   
-First, let us focus on the first targeted dataset, the one store in the variable names **temperatures**. We want to have a tibble, and not a dataframe, so we first transform our table into a tibble. Then, we have to convert the data in their real datatype, such as date our numeric. Then, we select only the column that show variable which wille be use in our analysis later, in this case the temperature, the country and the year. In order to avoid `N.A.` value, we convert `N.A.` value into 0. Then, we have daily data, and we want to transform this into yearly data, by averaging the daily termperature by year, using the `group_by` function and the `summarize` function. Finally, we decided to select the period beginning in 1970 and finishing in 2022. 
+  ## 2.3. Cleaining the data
+  
+  First, let us focus on the first targeted dataset, the one store in the variable names **temperatures**. We want to have a tibble, and not a dataframe, so we first transform our table into a tibble. Then, we have to convert the data in their real datatype, such as date our numeric. Then, we select only the column that show variable which wille be use in our analysis later, in this case the temperature, the country and the year. In order to avoid `N.A.` value, we convert `N.A.` value into 0. Then, we have daily data, and we want to transform this into yearly data, by averaging the daily termperature by year, using the `group_by` function and the `summarize` function. Finally, we decided to select the period beginning in 1970 and finishing in 2022. 
 ```{r, message=FALSE, warning=FALSE}
-  temp <- select(temperatures, dt, AverageTemperature, Country)
-  temp[is.na(temp)] = 0
-  temp$year <- format(as.Date(temp$dt, format="%Y-%d-%m"),"%Y")
-  temperature_clean <- select(temp, year, Country, AverageTemperature)
-  temp_df <- temperature_clean %>%
-    group_by(year, Country) %>%
-    summarize((mean=mean(AverageTemperature)))
-  period <- filter(temp_df, year >= 1970)
-  colnames(period) = c("Years", "Countries", "C")
-  period[1] <- apply(period[1], 2, as.numeric)
-  head(period)
+temp <- select(temperatures, dt, AverageTemperature, Country)
+temp[is.na(temp)] = 0
+temp$year <- format(as.Date(temp$dt, format="%Y-%d-%m"),"%Y")
+temperature_clean <- select(temp, year, Country, AverageTemperature)
+temp_df <- temperature_clean %>%
+  group_by(year, Country) %>%
+  summarize((mean=mean(AverageTemperature)))
+period <- filter(temp_df, year >= 1970)
+colnames(period) = c("Years", "Countries", "C")
+period[1] <- apply(period[1], 2, as.numeric)
+head(period)
 ```
 $~$
-Let us work on the next dataset, the CO2 emissions dataset. We produce for approximatively every dataset the same cleaning methodology, with small differences due to the raw dataset. For example below, with the CO2 dataset, we have first to rename the column, from X1961 to 1961, then to transform those multiple columns into a single column and associate the correct data. Then, we transform the datatype of the row year to have numerical year and filter because we focus on the period from 1970 up to 2013. 
+  Let us work on the next dataset, the CO2 emissions dataset. We produce for approximatively every dataset the same cleaning methodology, with small differences due to the raw dataset. For example below, with the CO2 dataset, we have first to rename the column, from X1961 to 1961, then to transform those multiple columns into a single column and associate the correct data. Then, we transform the datatype of the row year to have numerical year and filter because we focus on the period from 1970 up to 2013. 
 ```{r, message=FALSE, warning=FALSE}
-  attach(CO2_emissions)
-  emission <- as.tbl(CO2_emissions)
-  colnames(emission) <- c("Countries", 1960:2018)
-  years <- as.character(1960:2018)
-  emission_clean1 <- emission %>%
-    pivot_longer(years, names_to = "Years", values_to = "CO2")
-  emission_clean1[2] <- apply(emission_clean1[2], 2, as.numeric)
-  emission_clean2 <- filter(emission_clean1, Years <= 2013)
-  emission_clean3 <- filter(emission_clean2, Years >= 1970)
-  emission_clean <- emission_clean3 %>% group_by(Countries) %>% mutate(CO2_cumulated = cumsum(CO2))
-  head(emission_clean)
+attach(CO2_emissions)
+emission <- as.tbl(CO2_emissions)
+colnames(emission) <- c("Countries", 1960:2018)
+years <- as.character(1960:2018)
+emission_clean1 <- emission %>%
+  pivot_longer(years, names_to = "Years", values_to = "CO2")
+emission_clean1[2] <- apply(emission_clean1[2], 2, as.numeric)
+emission_clean2 <- filter(emission_clean1, Years <= 2013)
+emission_clean3 <- filter(emission_clean2, Years >= 1970)
+emission_clean <- emission_clean3 %>% group_by(Countries) %>% mutate(CO2_cumulated = cumsum(CO2))
+head(emission_clean)
 ```
 $~$
-The next dataset we are considering here is the one with the GDP. In this dataset, we firstly selected only the targeted variables, which were GDP in $, the countries and the year. We replace the `N.A.` value by 0 for following statistical calculation and filter the selected period.
- 
- 
+  The next dataset we are considering here is the one with the GDP. In this dataset, we firstly selected only the targeted variables, which were GDP in $, the countries and the year. We replace the `N.A.` value by 0 for following statistical calculation and filter the selected period.
+
+
 ```{r, warning=FALSE, message=FALSE}
-  attach(GDP)
-  GDP_clean <- select(GDP, Country.Name, year, GDP_USD)
-  colnames(GDP_clean) <- c("Countries", "Years", "GDP")
-  GDP_tbl1 <- as.tbl(GDP_clean)
-  GDP_tbl1[is.na(GDP_tbl1)] = 0
-  GDP_tbl2 <- filter(GDP_tbl1, Years <= 2013)
-  GDP_tbl <- filter(GDP_tbl2, Years >= 1970)
-  head(GDP_tbl)
+attach(GDP)
+GDP_clean <- select(GDP, Country.Name, year, GDP_USD)
+colnames(GDP_clean) <- c("Countries", "Years", "GDP")
+GDP_tbl1 <- as.tbl(GDP_clean)
+GDP_tbl1[is.na(GDP_tbl1)] = 0
+GDP_tbl2 <- filter(GDP_tbl1, Years <= 2013)
+GDP_tbl <- filter(GDP_tbl2, Years >= 1970)
+head(GDP_tbl)
 ```
 $~$
-Then, let's move to the unemployment dataset. As previously, we began by selecting the targeted variables, then rename the column in order to avoid problem when we will merge the data. Then we transform the dataframe into a tibble, clean the `N.A.` value and filter according to the timeline.
+  Then, let's move to the unemployment dataset. As previously, we began by selecting the targeted variables, then rename the column in order to avoid problem when we will merge the data. Then we transform the dataframe into a tibble, clean the `N.A.` value and filter according to the timeline.
 ```{r, message=FALSE, warning=FALSE}
   attach(unemployment)
   unemployment_clean <- select(unemployment, country, year, Unemployment..total....of.total.labor.force...national.estimate.)
@@ -355,13 +355,13 @@ $~$
 $~$
 Let's have a look at geographical location, respectively lattitude and longitude. Here, we juste have to select the variable and change the name of the columns
 ```{r}
-  location_clean <- select(location, country, latitude, longitude)
+location_clean <- select(location, country, latitude, longitude)
 colnames(location_clean) <- c("Countries", "latitude", "longitude")
-  head(location_clean)
+head(location_clean)
 ``` 
 $~$
-$~$
-Last dataset to clean, was the difference of temperatures. First, we select the targeted variable, and then sort them in order to have data by month and year. We chose to focus on yearly differential and filter sccording to this. Then we rename the column and filter according to the period.
+  $~$
+  Last dataset to clean, was the difference of temperatures. First, we select the targeted variable, and then sort them in order to have data by month and year. We chose to focus on yearly differential and filter sccording to this. Then we rename the column and filter according to the period.
 $~$
 ```{r}
 attach(deltatemp)
@@ -374,49 +374,49 @@ deltatemperatures2 <- as.tbl(deltatemperatures1)
 deltatemperatures3 <- filter(deltatemperatures2, Years <= 2013)
 deltatemperatures <- filter(deltatemperatures3, Years >= 1970)
 head(deltatemperatures)
-````
+```
 $~$
-
-Now, let us merge the different dataframe we have to create one big dataframe, with the targeted countries. First, we created a vector with the chossen countries. After that, we create a for loop to avoid repetitive coding. We let the loop filter every previously created dataset by the chosen countries to finally create our final datasets. 
+  
+  Now, let us merge the different dataframe we have to create one big dataframe, with the targeted countries. First, we created a vector with the chossen countries. After that, we create a for loop to avoid repetitive coding. We let the loop filter every previously created dataset by the chosen countries to finally create our final datasets. 
 $~$
 ```{r}
 a = 1
 i = 0
 countries = c("Norway", "Brazil", "South Africa", "Belgium", "Japan", "Canada", "Argentina", "Australia", "Thailand", "Peru")
-    for (i in countries){
-      temp <- period %>%filter(Countries %in% countries) 
-      co2 <- emission_clean %>%filter(Countries %in% countries)
-      gdp <- GDP_tbl %>% filter(Countries %in% countries)
-      unemployed <- unemployment_tbl %>% filter(Countries %in% countries)
-      populated <- population_tbl%>% filter(Countries %in% countries)
-      urban_populated <- urban_population_cleaned %>% filter(Countries %in% countries)
-      deads <- demographic_tbl_clean %>% filter(Countries %in% countries)
-      temperature_differential <- deltatemperatures %>% filter(Countries %in% countries)
-      variable_list <- list(temp, co2, gdp, unemployed, populated, urban_populated, deads, temperature_differential)
-      df <- Reduce(function(x, y) merge(x, y, all=TRUE), variable_list)
-      df<-arrange(df, Countries)
-      return(df)
-    }
+for (i in countries){
+  temp <- period %>%filter(Countries %in% countries) 
+  co2 <- emission_clean %>%filter(Countries %in% countries)
+  gdp <- GDP_tbl %>% filter(Countries %in% countries)
+  unemployed <- unemployment_tbl %>% filter(Countries %in% countries)
+  populated <- population_tbl%>% filter(Countries %in% countries)
+  urban_populated <- urban_population_cleaned %>% filter(Countries %in% countries)
+  deads <- demographic_tbl_clean %>% filter(Countries %in% countries)
+  temperature_differential <- deltatemperatures %>% filter(Countries %in% countries)
+  variable_list <- list(temp, co2, gdp, unemployed, populated, urban_populated, deads, temperature_differential)
+  df <- Reduce(function(x, y) merge(x, y, all=TRUE), variable_list)
+  df<-arrange(df, Countries)
+  return(df)
+}
 df
 ```
 
 $~$
-$~$
-
-## 2.4. Spotting mistakes
-First, we replace N.A. by 0, what could impact our results in a bad way. But then, we decided to reduce our period to limit as much as possible the existence of N.A. values. However, reducing the number of years, limit our analysis, because climate change take decades to evolve. 
+  $~$
+  
+  ## 2.4. Spotting mistakes
+  First, we replace N.A. by 0, what could impact our results in a bad way. But then, we decided to reduce our period to limit as much as possible the existence of N.A. values. However, reducing the number of years, limit our analysis, because climate change take decades to evolve. 
 
 One of the mistake that has probably occurred in our work was that those countries are quite huge and the difference in temperature in the north and south could be quite high. So using average yearly temperatures could be too simplified.
 
 Perhaps, our timeline is too short. Those kind of event such as global warming appear to affect the earth on a long-term point og view. Here, we limit ourself on data between 1970 and 2013 because some of our parameters were not available before or after this timeline. 
 
 $~$
-$~$
-$~$
-
-# 3. Exploratory data analysis
-## 3.1. Statistical national Model
-Now, we will begin to investigate each country individually first. Each country's analysis will follow the same process, beginning by looking at the correlation, then visualize the relation and finally using linear model.
+  $~$
+  $~$
+  
+  # 3. Exploratory data analysis
+  ## 3.1. Statistical national Model
+  Now, we will begin to investigate each country individually first. Each country's analysis will follow the same process, beginning by looking at the correlation, then visualize the relation and finally using linear model.
 $~$
 
 ### 3.1.1 Norway
@@ -438,18 +438,18 @@ Thanks to this illustration, we can see that there are approximately the same re
 
 $~$
 Now let's determine if the correlation coefficient between CO2 cumulated and temperature change is significantly different from 0. first, we pose the different assumptions: 
- 
- $$ \begin{cases} \ H0: ρ = 0 \\ H1:  ρ ≠ 0  \end{cases} $$
- 
-So we will test statistically if this seems right. We set the level of confidence at **α = 5%**. In order to do that, we have to find the tcritical and tcalculated and compare them. To calculate the critical value, we use the function `qt`and for the calculated t, the following calulation: 
-$$ tcalc = \frac{r}{\frac{(1-r^{2})}{(df-2)}} $$
-```{r}
+  
+  $$ \begin{cases} \ H0: ρ = 0 \\ H1:  ρ ≠ 0  \end{cases} $$
+  
+  So we will test statistically if this seems right. We set the level of confidence at **α = 5%**. In order to do that, we have to find the tcritical and tcalculated and compare them. To calculate the critical value, we use the function `qt`and for the calculated t, the following calulation: 
+  $$ tcalc = \frac{r}{\frac{(1-r^{2})}{(df-2)}} $$
+  ```{r}
 tcrit <- qt(p=.05, df=43, lower.tail=FALSE)
 tcalc <- 0.53/sqrt((1-0.53)^2/(43-2))
 ```
 In this case, we have a tcalculated (7.22) that is far bigger than tcritical (1.68), so we reject H0 and this means that the correlation is significantly different from 0. 
 $~$
-According to our correlation plot, it seems that some variable contains the same information, therefore using them twice does not add value to the models. For example, the number of residents and urban population have a correlation rate of 1, so we can eliminate one of the value. In case of high correlation, we can look at the multicolinearisty of variable by using the VIF coefficient. Generally, we consider that if the VIF coefficient is higher tan 5, the multicolinearity is severe and the variable had to be eliminated.
+  According to our correlation plot, it seems that some variable contains the same information, therefore using them twice does not add value to the models. For example, the number of residents and urban population have a correlation rate of 1, so we can eliminate one of the value. In case of high correlation, we can look at the multicolinearisty of variable by using the VIF coefficient. Generally, we consider that if the VIF coefficient is higher tan 5, the multicolinearity is severe and the variable had to be eliminated.
 ```{r, message=FALSE, warning=FALSE}
 library(car)
 attach(df)
@@ -479,14 +479,21 @@ library(plotly)
 ll.smooth1 = loess(Norway$C~Norway$Years, span=0.75)
 ll.smooth2 = loess(Norway$CO2~Norway$Years, span=0.75)
 ll.smooth3 = loess(Norway$dC~Norway$Years, span=0.75)
-
-
-
+ll.smooth4 = loess(Norway$CO2_cumulated~Norway$Years, span=0.75)
 
 fig <- plot_ly(Norway, x =  ~Years, mode="lines", alpha = 0.65)
 fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$C, name = "Temperature", mode = "markers")
+
 fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$CO2, name = "CO2", visible = F, mode = "markers")
+
 fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
 fig <- fig %>% layout(
   title = "Comparisons of variable based on Timeline",
     xaxis = list(domain = c(0.1, 1)),
@@ -495,16 +502,20 @@ fig <- fig %>% layout(
           y = 0.8,
           buttons = list(
             list(method = "restyle",
-                args = list("visible", list(TRUE, FALSE, FALSE)),
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
                 label = "Temperature"),
             
             list(method = "restyle",
-               args = list("visible", list(FALSE, TRUE, FALSE)),
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
                label = "CO2"),
           
             list(method = "restyle",
-               args = list("visible", list(FALSE, FALSE, TRUE)),
-               label = "ΔTemperatures")
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
             )
           )
         )
@@ -516,21 +527,140 @@ fig
 
 
 #### 3.1.1.3. Linear Regression Model(s)
+First, as we already know, we'll have to eliminate some variable. In order to do that, we use a backward selection based on the criteria AIC to select the variable that are statistically significant.
 
 ```{r}
-model <- lm(Norway$C ~ Norway$CO2 + Norway$GDP + Norway$CO2_cumulated + Norway$jobless + Norway$Deaths + Norway$infantdeath + Norway$residents)
+model <- lm(Norway$C ~ Norway$CO2 + Norway$GDP + Norway$CO2_cumulated + Norway$jobless + Norway$Deaths  + Norway$residents)
 mynullmodel <- lm(Norway$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
+As we can see on the table above, at the end, there remain only cumulated CO2, the number of unemployed, the number of death that are significant in Norway relative to the temperatures. If we look at the table below, we can see that they are significant with an significant level of 2%, which is not really good.
+```{r}
+new_model <- lm(Norway$C ~ Norway$CO2_cumulated + Norway$jobless + 
+    Norway$Deaths)
+summary(new_model)
+```
 
+The, let's look at the delta temperature and the different variables to see if we can have a more significant model.
+```{r}
+model <- lm(Norway$dC ~ Norway$CO2 + Norway$GDP + Norway$CO2_cumulated + Norway$jobless + Norway$Deaths  + Norway$residents)
+mynullmodel <- lm(Norway$dC~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+In this case, only the CO2 is eliminated, probably because the information is already contained in the cunulated CO2. But as shwon in the table beow, there is still some variable that are not significantly with a confidence level of 5%, the model is worse than before.
+
+```{r}
+new_model <- lm(Norway$dC ~ Norway$GDP + Norway$CO2_cumulated + 
+    Norway$jobless + Norway$Deaths + Norway$residents)
+summary(new_model)
+```
+
+Now, let's see the relationship between CO2 and the remaining variables.
+```{r}
+model <- lm(Norway$CO2 ~ Norway$GDP + Norway$jobless + Norway$Deaths  + Norway$residents)
+mynullmodel <- lm(Norway$CO2~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+We can see that the CO2 depends on the number of unemployed and the number of death according to our model. But in this case, the model is a very precise one, and the variable are significant at a high level. However, those variables explain 32% of the variation of the Co2. This means that 68% of the remaining variation remains unexplained, which is bad.
+```{r}
+new_model <- lm(Norway$CO2 ~ Norway$jobless + Norway$Deaths)
+summary(new_model)
+```
+Now, let's consider the cumulated CO2.
+```{r}
+model <- lm(Norway$CO2_cumulated ~ Norway$GDP + Norway$jobless + Norway$Deaths  + Norway$residents)
+mynullmodel <- lm(Norway$CO2_cumulated~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+In this case, it adds the population to the remaining significant variables. The model is good, and it 97% of the variation of the CO2 cumulated are explain by our model. 
+```{r}
+new_model <- lm(Norway$CO2_cumulated ~ Norway$jobless + Norway$Deaths + 
+    Norway$residents)
+summary(new_model)
+```
+
+Then, we look at the new model. It remains only the variable unemployment, number of deaths and CO2 cumulated for our model. They are statistically significant with a p-value of more than 2%, which is not optimal. This does not go in the same direction as the VIF previously said. But if we look at the vif of the following model thanks to the elimination of some other variable, it eliminate the multicolinearity of the CO2 cumulated. 
 ```{r, message=FALSE}
 newmodel <- lm(Norway$C ~ Norway$CO2_cumulated + Norway$jobless + Norway$Deaths)
 summary(newmodel)
+vif_values3 <- vif(newmodel)
+bar_plot_vif3 <- barplot(vif_values3, main = "VIF Values of the New Model", horiz = TRUE, col = "steelblue", name=c(" Cumul. CO2","Jobless", "deaths"))
+```
+
+### 3.1.2. Brazil
+#### 3.1.2.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+library(corrplot)
+Brazil <- df %>% filter(Countries %in% "Brazil")
+corrplot.mixed(cor(Brazil[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-newmodel1 <- lm(df$C ~ df$CO2 + df$jobless + df$Deaths)
-summary(newmodel1)
+library(car)
+attach(df)
+model <- lm(Brazil$C ~ Brazil$CO2 + Brazil$GDP + Brazil$jobless + Brazil$Deaths + Brazil$infantdeath)
+vif_values <- vif(model)
+bar_plot_vif1 <- barplot(vif_values, main = "VIF Values", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea","Inf"))
+abline(v = 5, lwd = 3, lty = 2)
+```
+#### 3.1.2.2. Visualization
+
+```{r, message=FALSE, warning=FALSE}
+library(plotly)
+ll.smooth1 = loess(Brazil$C~Brazil$Years, span=0.75)
+ll.smooth2 = loess(Brazil$CO2~Brazil$Years, span=0.75)
+ll.smooth3 = loess(Brazil$dC~Brazil$Years, span=0.75)
+ll.smooth4 = loess(Brazil$CO2_cumulated~Brazil$Years, span=0.75)
+
+fig <- plot_ly(Brazil, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+#### 3.1.2.3. Linear Regression Model(s)
+```{r}
+model <- lm(Brazil$C ~ Brazil$CO2 + Brazil$GDP + Brazil$CO2_cumulated + Brazil$jobless + Brazil$Deaths + Brazil$infantdeath + Brazil$residents)
+mynullmodel <- lm(Brazil$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
 ### 3.1.3. Canada
@@ -539,6 +669,64 @@ summary(newmodel1)
 
 ## 3.2. International Comparisons 
 
+```{r, message=FALSE, warning=FALSE}
+df[is.na(df)] <- 0
+library(corrplot)
+corrplot.mixed(cor(df[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+df[is.na(df)] <- 0
+ll.smooth5 = loess(df$C~df$Years, span=0.75)
+ll.smooth6 = loess(df$CO2~df$Years, span=0.75)
+ll.smooth7 = loess(df$dC~df$Years, span=0.75)
+ll.smooth8 = loess(df$CO2_cumulated~df$Years, span=0.75)
+
+fig <- plot_ly(df, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth5), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~df$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth6), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~df$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth7), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~df$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth8), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~df$CO2_cumulated, name = "Cumulated CO2", visible=F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
 ## 3.2. Global Analysis
 
 Now, we want to explore another topics adressed in the research question: I there any relationships between the increased temperatures and the location of the countries. To analysze this, we will look at the difference in temperature and the location dataset to create a new dataset. 
@@ -550,31 +738,18 @@ dataframe_locationdt <- locationandtemp %>% filter(locationandtemp$Countries %in
 dataframe_locationdt
 ```
 
+
+
 ```{r, message=FALSE, warning=FALSE}
-world <- map_data("world")
+library(rworldmap)
+dataFramee <- deltatemperatures
 
-ggplot() +
-  geom_map(
-    data = world, map = world,
-    aes(long, lat, map_id = region),
-    color = "white", fill = "lightgray", size = 0.1
-  ) +
-  geom_point(
-    data = dataframe_locationdt,
-    aes(longitude, latitude, 
-        color = Countries,
-        size = dC),
-    alpha = 0.5
-    ) +
-  theme_void()
+sPDF <- joinCountryData2Map(dataFramee, joinCode='NAME', nameJoinColumn='Countries')
+mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatures per location", missingCountryCol='dark grey')
 ```
-
 
 
 # 5. Conclusion
 ## 5.1. Key message
 ## 5.2. Limitations
 ## 5.3. Future Work
-
-
-
