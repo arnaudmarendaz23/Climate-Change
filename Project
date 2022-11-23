@@ -692,8 +692,6 @@ corrplot.mixed(cor(Brazil[,-c(1, 2)]),
 As we can see, there is many high correlation in Brazil in comparisons with the Norway. For example, the correlation between CO2 cumulated and population is at 0.99, which is quite amazing. But, we can see that there will be many multicollinearity, due to the high correlation between the variables. Now, let's briefly look at the VIF to have a first impression about multicollinearity and which variable contain the same information. As you can see, the VIF for population and cumulated CO2 is so high that we can not see which variable are below or abvove the threshold. That's why we printed a second table without these variables.
 
 ```{r, message=FALSE, warning=FALSE}
-library(car)
-attach(df)
 model1 <- lm(Brazil$C ~ Brazil$CO2 + Brazil$GDP + Brazil$jobless + Brazil$Deaths  + Brazil$residents)
 vif_values1 <- vif(model1)
 bar_plot_vif2 <- barplot(vif_values1, main = " Brazil VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
@@ -865,9 +863,504 @@ mynullmodel <- lm(Brazil$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 3.1.3. Canada
 
+```{r}
+Canada <- df %>% filter(Countries %in% "Canada")
+library(table1)
+table1::label(Canada$residents) <- "Population"
+table1::label(Canada$GDP) <- "GDP"
+table1::label(Canada$dC) <- "Temperature differential"
+table1::label(Canada$Deaths) <- "Death"
+table1::label(Canada$jobless) <- "Unemployed"
+table1::label(Canada$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Canada, overall="Canada")
+```
+```{r}
+ndf <- Canada[-c(1:5)]
+pdf <- Canada[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+``` 
+#### 3.1.3.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Brazil[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Canada$C ~ Canada$CO2 + Canada$GDP + Canada$jobless + Canada$Deaths  + Canada$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Canada VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
+
+#### 3.1.3.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Canada$C~Canada$Years, span=0.75)
+ll.smooth2 = loess(Canada$CO2~Canada$Years, span=0.75)
+ll.smooth3 = loess(Canada$dC~Canada$Years, span=0.75)
+ll.smooth4 = loess(Canada$CO2_cumulated~Canada$Years, span=0.75)
+
+fig <- plot_ly(Canada, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Canada$residents~Canada$dC, span=0.75)
+ll.smooth11 = lm(Canada$jobless~Canada$dC, span=0.75)
+ll.smooth12 = lm(Canada$Deaths~Canada$dC, span=0.75)
+ll.smooth13 = lm(Canada$GDP~Canada$dC, span=0.75)
+
+fig <- plot_ly(Brazil, x =  ~Canada$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Canada$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Canada$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Canada",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Canada"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Canada$C~Canada$CO2, span=0.75)
+ll.smooth2 = lm(Canada$dC~Canada$CO2, span=0.75)
+fig <- plot_ly(Canada, x =  ~Canada$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$dC, name = "Differences of temperatures in Canada", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Canada",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Canada"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Canada$C~Canada$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Canada$dC~Canada$CO2_cumulated, span=0.75)
+fig <- plot_ly(Canada, x =  ~Canada$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Canada$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Canada",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Canada"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+
+####3.1.3.3. Linear Regression Model(s)
+
+```{r, message=FALSE, warning=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada)
+mynullmodel <- lm(Canada$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 3.1.4. South Africa
+
+```{r}
+South_Africa <- df %>% filter(Countries %in% "South Africa")
+table1::label(South_Africa$residents) <- "Population"
+table1::label(South_Africa$GDP) <- "GDP"
+table1::label(South_Africa$dC) <- "Temperature differential"
+table1::label(South_Africa$Deaths) <- "Death"
+table1::label(South_Africa$jobless) <- "Unemployed"
+table1::label(South_Africa$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = South_Africa, overall="South Africa")
+```
+
+```{r}
+ndf <- South_Africa[-c(1:5)]
+pdf <- South_Africa[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+#### 3.1.4.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(South_Africa[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 3.1.5. Peru
+```{r}
+Peru <- df %>% filter(Countries %in% "Peru")
+table1::label(Peru$residents) <- "Population"
+table1::label(Peru$GDP) <- "GDP"
+table1::label(Peru$dC) <- "Temperature differential"
+table1::label(Peru$Deaths) <- "Death"
+table1::label(Peru$jobless) <- "Unemployed"
+table1::label(Peru$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Peru, overall="Peru")
+```
+
+```{r}
+ndf <- Peru[-c(1:5)]
+pdf <- Peru[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+
+#### 3.1.5.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Peru[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+
+
+### 3.1.6. Belgium
+```{r}
+Belgium <- df %>% filter(Countries %in% "Belgium")
+library(table1)
+table1::label(Belgium$residents) <- "Population"
+table1::label(Belgium$GDP) <- "GDP"
+table1::label(Belgium$dC) <- "Temperature differential"
+table1::label(Belgium$Deaths) <- "Death"
+table1::label(Belgium$jobless) <- "Unemployed"
+table1::label(Belgium$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Belgium, overall="Belgium")
+```
+
+```{r}
+ndf <- Belgium[-c(1:5)]
+pdf <- Belgium[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+
+#### 3.1.6.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Belgium[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 3.1.7. Thailand
+```{r}
+Thailand <- df %>% filter(Countries %in% "Thailand")
+table1::label(Thailand$residents) <- "Population"
+table1::label(Thailand$GDP) <- "GDP"
+table1::label(Thailand$dC) <- "Temperature differential"
+table1::label(Thailand$Deaths) <- "Death"
+table1::label(Thailand$jobless) <- "Unemployed"
+table1::label(Thailand$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Thailand, overall="Thailand")
+```
+
+```{r}
+ndf <- Thailand[-c(1:5)]
+pdf <- Thailand[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+
+#### 3.1.7.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Thailand[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+
+
+
+### 3.1.8. Australia
+```{r}
+Australia <- df %>% filter(Countries %in% "Australia")
+table1::label(Australia$residents) <- "Population"
+table1::label(Australia$GDP) <- "GDP"
+table1::label(Australia$dC) <- "Temperature differential"
+table1::label(Australia$Deaths) <- "Death"
+table1::label(Australia$jobless) <- "Unemployed"
+table1::label(Australia$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Australia, overall="Australia")
+```
+
+```{r}
+ndf <- Australia[-c(1:5)]
+pdf <- Australia[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+#### 3.1.8.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Australia[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+### 3.1.9. Argentina
+
+```{r}
+Argentina <- df %>% filter(Countries %in% "Argentina")
+table1::label(Argentina$residents) <- "Population"
+table1::label(Argentina$GDP) <- "GDP"
+table1::label(Argentina$dC) <- "Temperature differential"
+table1::label(Argentina$Deaths) <- "Death"
+table1::label(Argentina$jobless) <- "Unemployed"
+table1::label(Argentina$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Argentina, overall="Argentina")
+```
+
+```{r}
+ndf <- Argentina[-c(1:5)]
+pdf <- Argentina[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+#### 3.1.9.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Argentina[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
+
+
+
+
+
+
+
+
+
+
+### 3.1.10. Japan
+```{r}
+Japan <- df %>% filter(Countries %in% "Japan")
+table1::label(Japan$residents) <- "Population"
+table1::label(Japan$GDP) <- "GDP"
+table1::label(Japan$dC) <- "Temperature differential"
+table1::label(Japan$Deaths) <- "Death"
+table1::label(Japan$jobless) <- "Unemployed"
+table1::label(Japan$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Japan, overall="Japan")
+```
+
+```{r}
+ndf <- Japan[-c(1:5)]
+pdf <- Japan[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+```
+
+#### 3.1.10.1. Correlation
+```{r, message=FALSE, warning=FALSE}
+corrplot.mixed(cor(Japan[,-c(1, 2)]),
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+```
+
 
 ## 3.2. International Comparisons and Analysi
 ```{r}
@@ -966,3 +1459,4 @@ mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatu
 ## 5.1. Key message
 ## 5.2. Limitations
 ## 5.3. Future Work
+
