@@ -14,11 +14,11 @@ output:
 # Executive Summary
   
   
-  - **Reasearch goal**
-  This analysis's primary goal is to assess how much the rise of temperature is impacted by the emissions (of CO2). In a subsequent step, we look at what affects the emissions on CO2 and the place of humanhood in it.
+- <font size="4"> **Reasearch goal** </font>
+<font size="3"> This analysis's primary goal is to assess how much the rise of temperature is impacted by the emissions (of CO2). In a subsequent step, we look at what affects the emissions on CO2 and the place of humanhood in it. </font>
 
-- **Methodology**
-We performed our research primarily using seven data sets, each of which was relevant to one of the three pillars of sustainability, namely the economy, society, and environment. Since rising temperatures affect all three sectors, selecting factors from these several sustainability categories allowed us to accurately allocate the major causes of the changes over the previous sixty years. In order to assess that the rising of temperatures is a global problem, we had to observe the changes on a local scale in different area, thus we chose to analyse the data of ten countries spread over the five continents;  Belgium, Brazil, (Egypt), Finland, Japan, (Netherlands), South Africa, (South Korea), (USA).
+- <font size="4"> **Methodology** </font>
+<font size="3"> We performed our research primarily using seven data sets, each of which was relevant to one of the three pillars of sustainability, namely the economy, society, and environment. Since rising temperatures affect all three sectors, selecting factors from these several sustainability categories allowed us to accurately allocate the major causes of the changes over the previous sixty years. In order to assess that the rising of temperatures is a global problem, we had to observe the changes on a local scale in different area, thus we chose to analyse the data of ten countries spread over the five continents;  Belgium, Brazil, (Egypt), Finland, Japan, (Netherlands), South Africa, (South Korea), (USA). </font>
 
 - **Main Takeaways**
 
@@ -34,7 +34,7 @@ $~$
 
 ## 1.1. Current Situation and Motivation
 
-According to Rockström et al. (2009), there are nine planetary boundaries which the human should not exceed if it wants to maintain favorable conditions on earth for their survival. One of them is so-called climate change. There fore, we can assess that climate change is the biggest challenge that humankind has ever faced. The definition of climate change is often broad or mixed with meteorological concepts. According to the Carbon Almanac (2022, p. 23), weather does not mean climate, but both concept are related. Climate refers to the overall weather within a certain geographical area.
+<font size="3"> According to Rockström et al. (2009), there are nine planetary boundaries which the human should not exceed if it wants to maintain favorable conditions on earth for their survival. One of them is so-called climate change. There fore, we can assess that climate change is the biggest challenge that humankind has ever faced. The definition of climate change is often broad or mixed with meteorological concepts. According to the Carbon Almanac (2022, p. 23), weather does not mean climate, but both concept are related. Climate refers to the overall weather within a certain geographical area.
 
 Rising temperatures will cause many problems, such as extreme weather events, rising sea levels, which will force millions of people to migrate, increase the number of diseases, accelerate the extinction of species, and threaten the balance of biodiversity. According to the Carbon Almanac and many other researchers (2022, p.2), 70% of our climate problems are due to coal, combustion, cows and concrete. Those factors generate mainly greenhouse gases, such as CO2 or methane and hence contribute to greenhouse effect and make the earth hotter. 
 
@@ -44,12 +44,12 @@ In order to reach climate goals targted in Paris 2015, we have to lower our emis
 
 According to Zeke Hausfather (2018), there are quite large local temperature differences, depending on various parameters such as geographical location. For example, a recent study has shown that France is warming up faster than the others, and has already reached the critical threshold of +1.7°C, where the worldwide average is +1.2°C (Ribes, Boé, Qasmi, Dubuisson, Douville & Terray, 2022, p. 1). This means that the effects of a temperature increase of 2°C, as explained above, could affect countries in the near future. There is therefore an inequality of the impact of global warming.
 
-All this explains why we decided to carry out a study on sustainable development, and more precisely on the different temperature trends in different countries of the world for the period between 1970 and 2013. This time horizon was imposed on us by the data at our disposal. Thus, in order to make our analysis as global as possible, we have tried, with the data currently available and historically, to select countries from various geographical areas, with developed or developing economies, with growing or stagnating populations. The targeted countries are: Norway, Brazil, South Africa, Belgium, Japan, Canada, Argentina, Australia, Thailand and Peru. 
+All this explains why we decided to carry out a study on sustainable development, and more precisely on the different temperature trends in different countries of the world for the period between 1970 and 2013. This time horizon was imposed on us by the data at our disposal. Thus, in order to make our analysis as global as possible, we have tried, with the data currently available and historically, to select countries from various geographical areas, with developed or developing economies, with growing or stagnating populations. The targeted countries are: Norway, Brazil, South Africa, Belgium, Japan, Canada, Argentina, Australia, Thailand and Peru. </font>
 
 $~$
 
 ## 1.2. Related Works
-Below you will find some good books about climate change. First, the book by an independent journalist, "Bon Pote", which is a good popularisation of the subject. The other two books are scientific and very data-driven. A work closer to ours is the one done by Zeke Hausfather and quoted above, explaining that France is warming faster than the average. Finally, what would work on sustainable development be without the titanic work done for years by the IPCC and their alarmist reports and data. 
+<font size="3"> Below you will find some good books about climate change. First, the book by an independent journalist, "Bon Pote", which is a good popularisation of the subject. The other two books are scientific and very data-driven. A work closer to ours is the one done by Zeke Hausfather and quoted above, explaining that France is warming faster than the average. Finally, what would work on sustainable development be without the titanic work done for years by the IPCC and their alarmist reports and data. 
 
 
 Bonpote, Brès, A. & Marc, C.(2022). Tout comprendre (ou presque) sur le climat. Paris: CNRS.
@@ -60,24 +60,24 @@ Thunberg, G. (2022). The Climate book. London: Penguin.
 
 The Carbon Almanac. (2022). It's not too late. New York: Penguin.
 
-[IPCC. (2022). Climate Change 2022.](https://www.unep.org/fr/resources/rapport/www.ipcc.ch/report/sixth-assessment-report-working-group-ii/) 
+[IPCC. (2022). Climate Change 2022.](https://www.ipcc.ch/sr15/) </font>
 
 $~$
   
 ## 1.3. Research questions
   
-  * **Descriptive statistic**
-  + Is there a global warming for each selected country from 1970 to 2013?
+* **Descriptive statistic**
+<font size="3">  + Is there a global warming for each selected country from 1970 to 2013?
   + How have the emissions of CO2 for each selected country changed from 1970 to 2013?
   + How is the correlation between the emissions and the warming for each selected country?
   + Is the difference in temperature more interesting than the raw average temperature by year ?
-  + Is there a kind of inertia relationship between CO2 emissions and temperatures ? 
+  + Is there a kind of inertia relationship between CO2 emissions and temperatures ? </font>
   
-  * **Inferential statistic**
-  + What are the factors (economical, environmental or social) that impact/explain the most the emissions, hence the global warming?
+* **Inferential statistic**
+<font size="3">  + What are the factors (economical, environmental or social) that impact/explain the most the emissions, hence the global warming?
   + In relation to the question 2.1, are the north countries more impacted ?
   + Can we observed with the data what G. Thunberg explains in her book, the reduction of CO2 emission in some countries due to outsourcing or delocalization?
-  + Finally, is there an increase in death in the country affected by increased severe temperatures ?
+  + Finally, is there an increase in death in the country affected by increased severe temperatures ? </font>
   
   $~$
   $~$
@@ -87,8 +87,7 @@ $~$
   
 # 2. Data
 ## 2.1. Data Set of Global warming (raw)
-  
-  First, we are going to take the **library** that we are going to use in this project. this will help us performing some complex statistic calculation or help us cleaning the data. At the same time, let us upload our data from the various datasets defined previously and store them into variables.
+First, we are going to take the **library** that we are going to use in this project. this will help us performing some complex statistic calculation or help us cleaning the data. At the same time, let us upload our data from the various datasets defined previously and store them into variables.
 ```{r results=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(tidyr)
@@ -110,12 +109,10 @@ location <- read.csv("world_country_and_usa_states_latitude_and_longitude_values
 demographic <- read.csv("demographic.csv")
 deltatemp <- read.csv("FAOSTAT_data_1-10-2022.csv")
 ```
-
 ### 2.1.1 Temperatures
 You will find below the source of this data set:
   [Kaggle - temperature change dataset.](https://www.kaggle.com/datasets/sevgisarac/temperature-change?resource=download) 
 The temperature evolution dataset found on Kaggle explains the annual, monthly evolution of the average surface temperature in 190 countries. The time of this data is from 1960 to 2020 and the unit is degrees Celsius. Below you will find the explanation of the column, and the top rows of the raw dataset.
-
 ```{r}
 knitr::kable(cbind(
   c("dt", "AverageTemperature", "AverageTemperatureUncertainty", "Country"),
@@ -123,12 +120,9 @@ knitr::kable(cbind(
   )
 ), col.names = c('Variables', 'Meanings')) %>% kable_styling(position = "center")
 ```
-
 ```{r}
 head(temperatures)
 ```
-$~$
-  
 ### 2.1.2. CO2 Emissions
   You will find below the source of this data set:[Kaggle - CO2 emission dataset.](https://www.kaggle.com/datasets/kkhandekar/co2-emissions-1960-2018)
 The CO2 emissions dataset represents the CO2 emissions per capita in kilotonne and per country over the period 1960-2018. Below you will see the description of the variable and the top row of the raw data.
@@ -240,7 +234,7 @@ $~$
   
 ## 2.3. Cleaining the data
   
-  First, let us focus on the first targeted dataset, the one store in the variable names **temperatures**. We want to have a tibble, and not a dataframe, so we first transform our table into a tibble. Then, we have to convert the data in their real datatype, such as date our numeric. Then, we select only the column that show variable which wille be use in our analysis later, in this case the temperature, the country and the year. In order to avoid `N.A.` value, we convert `N.A.` value into 0. Then, we have daily data, and we want to transform this into yearly data, by averaging the daily termperature by year, using the `group_by` function and the `summarize` function. Finally, we decided to select the period beginning in 1970 and finishing in 2022. 
+<font size="3"> First, let us focus on the first targeted dataset, the one store in the variable names **temperatures**. We want to have a tibble, and not a dataframe, so we first transform our table into a tibble. Then, we have to convert the data in their real datatype, such as date our numeric. Then, we select only the column that show variable which wille be use in our analysis later, in this case the temperature, the country and the year. In order to avoid `N.A.` value, we convert `N.A.` value into 0. Then, we have daily data, and we want to transform this into yearly data, by averaging the daily termperature by year, using the `group_by` function and the `summarize` function. Finally, we decided to select the period beginning in 1970 and finishing in 2022. 
   
 Let us work on the next dataset, the CO2 emissions dataset. We produce for approximatively every dataset the same cleaning methodology, with small differences due to the raw dataset. For example below, with the CO2 dataset, we have first to rename the column, from X1961 to 1961, then to transform those multiple columns into a single column and associate the correct data. Then, we transform the datatype of t.
 
@@ -252,7 +246,7 @@ Now, let us goes to the population dataset. There, nothing special to mention, w
 
 Here, we move to the demographic dataset and look only at the main variables, namely countries, years, deaths and infant deaths. This follow the previously mentionned steps.
 
-Last dataset to clean, was the difference of temperatures. First, we select the targeted variable, and then sort them in order to have data by month and year. We chose to focus on yearly differential and filter sccording to this. Then we rename the column and filter according to the period.
+Last dataset to clean, was the difference of temperatures. First, we select the targeted variable, and then sort them in order to have data by month and year. We chose to focus on yearly differential and filter sccording to this. Then we rename the column and filter according to the period. </font>
 ```{r, message=FALSE, warning=FALSE}
 
 temp <- select(temperatures, dt, AverageTemperature, Country)
@@ -343,7 +337,7 @@ head(df)
 $~$
   
 ## 2.4. Spotting mistakes
-  First, we replace N.A. by 0, what could impact our results in a bad way. But then, we decided to reduce our period to limit as much as possible the existence of N.A. values. However, reducing the number of years, limit our analysis, because climate change take decades to evolve. 
+<font size="3"> First, we replace N.A. by 0, what could impact our results in a bad way. But then, we decided to reduce our period to limit as much as possible the existence of N.A. values. However, reducing the number of years, limit our analysis, because climate change take decades to evolve. 
 
 One of the mistake that has probably occurred in our work was that those countries are quite huge and the difference in temperature in the north and south could be quite high. So using average yearly temperatures could be too simplified.
 
@@ -358,7 +352,28 @@ $~$
 
 ### 3.1.1 Norway
 We begin first of all with the Norway. Norway is a country situated in the North and got in average low temperatures. Thus, this is an occidental country, well-developed and industrialized. 
-$~$
+
+```{r}
+Norway <- df %>% filter(Countries %in% "Norway")
+library(table1)
+table1::label(Norway$residents) <- "Population"
+table1::label(Norway$GDP) <- "GDP"
+table1::label(Norway$dC) <- "Temperature differential"
+table1::label(Norway$Deaths) <- "Death"
+table1::label(Norway$jobless) <- "Unemployed"
+table1::label(Norway$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Norway, overall="Norway")
+```
+
+```{r}
+ndf <- Norway[-c(1:5)]
+pdf <- Norway[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+``` 
 
 #### 3.1.1.2. Correlation
 
@@ -407,13 +422,13 @@ $~$
 
 #### 3.1.1.2. Visualization
 
-First, we want to determine whether there is a trend in temperature in Norway during the selected timeline. First, let's observe this with a trendline based on the `loess` function. In order to plot this, we use the function `plot_ly`from the `plotly`library. We parameter it in order to show the regression line and using an interactive drop-down menu in order to have a clean and understandable presentation. The x-axis represent the time in years and the y-axis the temperature in °C. The graph show that in Norway during this period the temperature have decrease from 1970 to 1980, and then constantly raised up to 2010 and then begin to decrease again. Therefore, it contradicts the global theory, which state that temperature have globally increase from several degrees since the 18th century.
+<font size="3"> First, we want to determine whether there is a trend in temperature in Norway during the selected timeline. First, let's observe this with a trendline based on the `loess` function. In order to plot this, we use the function `plot_ly`from the `plotly`library. We parameter it in order to show the regression line and using an interactive drop-down menu in order to have a clean and understandable presentation. The x-axis represent the time in years and the y-axis the temperature in °C. The graph show that in Norway during this period the temperature have decrease from 1970 to 1980, and then constantly raised up to 2010 and then begin to decrease again. Therefore, it contradicts the global theory, which state that temperature have globally increase from several degrees since the 18th century.
 
 At the same time, let's look at the historical C02 emission. In this part, we want to see if there is truly a relationship between temperature and CO2, because the correlation ratio does not go in this direction. That's what illustrate the second figure. We use the `ggplot`function too in those case. Here we've got a negative slope up to 1990, which mean that CO2 has decreased with years. After that, the emission have exponentially increases. This can be explained by the fact that in 1985, most of occidental countries have delocalize their production in other eastern countries. So it could have lowered their CO2 emissions.
 
 Finally, we look at the difference in temperatures, to see if they are a better representation of the CO2 than the average temperature. According to the correlation plot, it seems that the differences in temperatures and the average temperatures are very similar in term of trends. And that does not really follow the patterns illustrate in CO2 emission, unless a inertia relationship exist. For example, the peak of CO2 emission was in 1985, and the peak in temperature in 2010.
 
-Here we use a `loess` approximation to trace a line that show patterns. The, we use the package `plotly` to plot in an interactive and more visible way. We add point to the graph to see the point and the trendline.  
+Here we use a `loess` approximation to trace a line that show patterns. The, we use the package `plotly` to plot in an interactive and more visible way. We add point to the graph to see the point and the trendline. </font>
 
 ```{r, message=FALSE, warning=FALSE}
 library(plotly)
@@ -421,23 +436,19 @@ ll.smooth1 = loess(Norway$C~Norway$Years, span=0.75)
 ll.smooth2 = loess(Norway$CO2~Norway$Years, span=0.75)
 ll.smooth3 = loess(Norway$dC~Norway$Years, span=0.75)
 ll.smooth4 = loess(Norway$CO2_cumulated~Norway$Years, span=0.75)
-
 fig <- plot_ly(Norway, x =  ~Years, mode="lines", alpha = 0.65)
 fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$C, name = "Temperature", mode = "markers")
-
 fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$CO2, name = "CO2", visible = F, mode = "markers")
-
 fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$dC, name = "dC", visible = F, mode = "markers")
-
 fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
-
 fig <- fig %>% layout(
-  title = "Comparisons of variable based on Timeline",
-    xaxis = list(domain = c(0.1, 1)),
+  title = "Comparisons of variable based on the years",
+    xaxis = list(domain = c(0.1, 1), title = "Years"),
+    yaxis = list(title = "variable"),
     updatemenus = list(
         list(
           y = 0.8,
@@ -464,24 +475,65 @@ fig <- fig %>% layout(
 fig
 ```
 
+Here, we look at the relation between the difference in temperature and the variable population, unemployment, death and GDP. 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Norway$residents~Norway$dC, span=0.75)
+ll.smooth11 = lm(Norway$jobless~Norway$dC, span=0.75)
+ll.smooth12 = lm(Norway$Deaths~Norway$dC, span=0.75)
+ll.smooth13 = lm(Norway$GDP~Norway$dC, span=0.75)
+
+fig <- plot_ly(Norway, x =  ~Norway$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Norway$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Norway$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Norway$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Norway",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Norway"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
 Now, let's have a look at the relation between the temperature nd the CO2. Here, we use the same concept as previously, but only look at the CO2 and the temperatures. Both the differences and temperature and the temperature have a negative relation with the CO2, what seems impossible to us. This means that if the country emits more CO2, the temperature will decline. Why does this give us such representation ? We can imagine that the CO2 of one year will only affect the temperature some years later, or the cumulated CO2 should have more impact than raw CO2.
 
 ```{r, message=FALSE, warning=FALSE}
-
 ll.smooth1 = lm(Norway$C~Norway$CO2, span=0.75)
 ll.smooth2 = lm(Norway$dC~Norway$CO2, span=0.75)
-
-
 fig <- plot_ly(Norway, x =  ~Norway$CO2, mode="lines", alpha = 0.65)
 fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$C, name = "Temperatures", mode = "markers")
-
 fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
-fig <- fig %>% add_trace(y = ~Norway$dC, name = "Differences of temperatures", visible = F, mode = "markers")
-
+fig <- fig %>% add_trace(y = ~Norway$dC, name = "Differences of temperatures in Norway", visible = F, mode = "markers")
 fig <- fig %>% layout(
-  title = "Comparisons of variable based on Timeline",
-    xaxis = list(domain = c(0.1, 1)),
+  title = "Temperature variation based on CO2 in Norway",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Norway"),
+    yaxis = list(title = "°C"),
     updatemenus = list(
         list(
           y = 0.8,
@@ -502,24 +554,18 @@ fig
 
 Let's have a look at the relation between the temperature or differences of temperatures and the cumulated CO2. The graph show a positive relationship, what looks more logical. So we can already imagine that the cumulated CO2 make more sense than the raw CO2 per year.
 ```{r, message=FALSE, warning=FALSE}
-
 ll.smooth1 = lm(Norway$C~Norway$CO2_cumulated, span=0.75)
 ll.smooth2 = lm(Norway$dC~Norway$CO2_cumulated, span=0.75)
-
-
-
 fig <- plot_ly(Norway, x =  ~Norway$CO2_cumulated, mode="lines", alpha = 0.65)
 fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$C, name = "Temperatures", mode = "markers")
-ll.smooth1 = lm(Norway$C~Norway$CO2_cumulated, span=0.75)
-
 fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
 fig <- fig %>% add_trace(y = ~Norway$dC, name = "Differences of temperatures", visible = F, mode = "markers")
-
 fig <- fig %>% layout(
-  title = "Comparisons of variable based on Timeline",
-    xaxis = list(domain = c(0.1, 1)),
-    updatemenus = list(
+  title = "Temperature variaton based on cumulated CO2 in Norway",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Norway"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
         list(
           y = 0.8,
           buttons = list(
@@ -539,63 +585,98 @@ fig
 
 #### 3.1.1.3. Linear Regression Model(s)
 
-First, as we already know, we'll have to eliminate some variable. In order to do that, we use a backward selection based on the criteria AIC to select the variable that are statistically significant. In order to do that, we use the function `step` and choose as a direction backward. We will do this several time, to see if a model considering the differences in temperature make more sense statistically than with temperature, and look at CO2 and cumulated CO2 as the dependent variable. But let's begin with the temperatures.
+<font size="3"> First, as we already know, we'll have to eliminate some variable. In order to do that, we use a backward selection based on the criteria AIC to select the variable that are statistically significant. In order to do that, we use the function `step` and choose as a direction backward. We will do this several time, to see if a model considering the differences in temperature make more sense statistically than with temperature, and look at CO2 and cumulated CO2 as the dependent variable. But let's begin with the temperatures. </font>
 
 ```{r}
-model <- lm(Norway$C ~ Norway$CO2 + Norway$GDP + Norway$CO2_cumulated + Norway$jobless + Norway$Deaths  + Norway$residents)
-mynullmodel <- lm(Norway$C~1)
-step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
-```
-As we can see on the table above, at the end, there remain only cumulated CO2, the number of unemployed, the number of death that are significant in Norway relative to the temperatures. If we look at the table below, we can see that they are significant with an significant level of 2%, which is not really good. Furthermore, our current model explain only 40% of the variation in temperature in Norway, what is really bad. We know that in reality, there is many more variables than our current model, but we think that there with a good mixed of variable, we could find something higher.
-
-```{r}
-new_model <- lm(Norway$C ~ Norway$CO2_cumulated + Norway$jobless + 
-    Norway$Deaths)
-summary(new_model)
+model1 <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
+new_model <- lm(C ~ jobless + 
+    Deaths, data = Norway)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
+new_model2 <- lm(dC ~ jobless + Deaths, data=Norway)
 ```
 
-Then, let's look at the delta temperature and the different variables to see if we can have a more significant model. e only have to change the model we observe and replace the C variable by dC. This gave us the following.
-```{r}
-model <- lm(Norway$dC ~ Norway$CO2 + Norway$GDP + Norway$CO2_cumulated + Norway$jobless + Norway$Deaths  + Norway$residents)
-mynullmodel <- lm(Norway$dC~1)
-step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
-```
-In this case, only the CO2 is eliminated, probably because the information is already contained in the cunulated CO2. But as shwon in the table beow, there is still some variable that are not significantly with a confidence level of 5%, the model is worse than before. This model explain 45% of the variation of dC, which is better than previously, but remain really poor. 
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
 
-```{r}
-new_model <- lm(Norway$dC ~ Norway$GDP + Norway$CO2_cumulated + 
-    Norway$jobless + Norway$Deaths + Norway$residents)
-summary(new_model)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
 ```
 
-Now, we see in different theory that most of the global warming was due to the increase in Greenhouse gas emission, and notable the increase in CO2. So we wan to find a model based on the previous variable that explain the increase in CO2 emission. Let's see the relationship between CO2 and the remaining variables.
-```{r}
-model <- lm(Norway$CO2 ~ Norway$GDP + Norway$jobless + Norway$Deaths  + Norway$residents)
-mynullmodel <- lm(Norway$CO2~1)
-step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
-```
-We can see that the CO2 depends on the number of unemployed and the number of death according to our model. But in this case, the model is not a precise one, but the variables are significant at a high level. Those variables explain only 32% of the variation of the Co2. This means that 68% of the remaining variation remains unexplained, which is bad. 
-```{r}
-new_model <- lm(Norway$CO2 ~ Norway$jobless + Norway$Deaths)
-summary(new_model)
-```
+
+<font size="3"> We can see that the CO2 depends on the number of unemployed and the number of death according to our model. But in this case, the model is not a precise one, but the variables are significant at a high level. Those variables explain only 32% of the variation of the Co2. This means that 68% of the remaining variation remains unexplained, which is bad. 
 Now, we will consider the cumulated CO2 based on our model.We already saw that the relationship between cumulated CO2 and temerature was far better than with CO2. Now, we want to identify which variable explain the increase in CO2 emission, still using the backward selection.
-```{r, message=FALSE, warning=FALSE}
-model <- lm(Norway$CO2_cumulated ~ Norway$GDP + Norway$jobless + Norway$Deaths  + Norway$residents)
-mynullmodel <- lm(Norway$CO2_cumulated~1)
-step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
-```
-In this case, it adds the population to the remaining significant variables in comparisons with CO2. The model is good, and it 97% of the variation of the CO2 cumulated are explain by our model.This mean that the cumulated CO2 can be explained by the unemployment, the number of deaths and the number of inhabitants. The variable unemployed is not significant if we apply a confidence level of 5% or less, so it could be eliminated, but at what cost in term of precision ? The cost in term of Rsquared will be really small, so we decided to reduce our model to residents and deaths. What is also interesting in this model, is that there is a positive relationship between cumulated CO2 and deaths. We can interpret this by explaining that a higher pollution of the air can murder some people or increase the risk of deaths.
+In this case, it adds the population to the remaining significant variables in comparisons with CO2. The model is good, and it 97% of the variation of the CO2 cumulated are explain by our model.This mean that the cumulated CO2 can be explained by the unemployment, the number of deaths and the number of inhabitants. The variable unemployed is not significant if we apply a confidence level of 5% or less, so it could be eliminated, but at what cost in term of precision ? The cost in term of Rsquared will be really small, so we decided to reduce our model to residents and deaths. What is also interesting in this model, is that there is a positive relationship between cumulated CO2 and deaths. We can interpret this by explaining that a higher pollution of the air can murder some people or increase the risk of deaths. </font>
 
 ```{r, message=FALSE, warning=FALSE}
-new_model <- lm(Norway$CO2_cumulated ~ Norway$Deaths + 
-    Norway$residents)
-summary(new_model)
+model5 <- lm(CO2 ~ GDP + jobless + Deaths  + residents, data=Norway)
+model7 <- lm(CO2 ~ jobless + Deaths, data=Norway)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Norway)
+model8 <- lm(CO2_cumulated ~ Deaths + 
+    residents, data=Norway)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### 3.1.2. Brazil
 Now, let's consider our second country, the Brazil. The Brazil is a big country that is in a developing phase, with a rising economy and population. 
+
+
+```{r}
+Brazil <- df %>% filter(Countries %in% "Brazil")
+library(table1)
+table1::label(Brazil$residents) <- "Population"
+table1::label(Brazil$GDP) <- "GDP"
+table1::label(Brazil$dC) <- "Temperature differential"
+table1::label(Brazil$Deaths) <- "Death"
+table1::label(Brazil$jobless) <- "Unemployed"
+table1::label(Brazil$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Brazil, overall="Brazil")
+```
+
+```{r}
+ndf <- Brazil[-c(1:5)]
+pdf <- Brazil[c(3:5)] 
+par(mfrow = c(1, ncol(ndf)))
+invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+
+par(mfrow = c(1, ncol(pdf)))
+invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+``` 
 
 #### 3.1.2.1. Correlation
 First, let's look at the correlation in Brazil between the different country. We use the function corrplot in order to create the following icture, which is more aesthetic than raw data, and decided to add the value in the lower part. 
@@ -673,6 +754,110 @@ fig <- fig %>% layout(
 )
 fig
 ```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Brazil$residents~Brazil$dC, span=0.75)
+ll.smooth11 = lm(Brazil$jobless~Brazil$dC, span=0.75)
+ll.smooth12 = lm(Brazil$Deaths~Brazil$dC, span=0.75)
+ll.smooth13 = lm(Brazil$GDP~Brazil$dC, span=0.75)
+
+fig <- plot_ly(Brazil, x =  ~Brazil$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Brazil$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Brazil$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Brazil",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Brazil"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Brazil$C~Brazil$CO2, span=0.75)
+ll.smooth2 = lm(Brazil$dC~Brazil$CO2, span=0.75)
+fig <- plot_ly(Brazil, x =  ~Brazil$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$dC, name = "Differences of temperatures in Brazil", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Brazil",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Brazil"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Brazil$C~Brazil$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Brazil$dC~Brazil$CO2_cumulated, span=0.75)
+fig <- plot_ly(Brazil, x =  ~Brazil$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Brazil$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Brazil",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Brazil"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
 #### 3.1.2.3. Linear Regression Model(s)
 ```{r, message=FALSE, warning=FALSE}
 model <- lm(Brazil$C ~ Brazil$CO2 + Brazil$GDP + Brazil$CO2_cumulated + Brazil$jobless + Brazil$Deaths + Brazil$residents)
@@ -684,7 +869,21 @@ step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 
 ### 3.1.4. South Africa
 
-## 3.2. International Comparisons and Analysis
+## 3.2. International Comparisons and Analysi
+```{r}
+library(table1)
+table1::label(df$residents) <- "Population"
+table1::label(df$GDP) <- "GDP"
+table1::label(df$dC) <- "Temperature differential"
+table1::label(df$Deaths) <- "Death"
+table1::label(df$jobless) <- "Unemployed"
+table1::label(df$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = df)
+```
+
+```{r, results='asis'}
+boxplot(df$dC,ylab="°C",main="Boxplot for differential of temperature in the world")
+``` 
 
 ```{r, message=FALSE, warning=FALSE}
 df[is.na(df)] <- 0
@@ -755,6 +954,13 @@ sPDF <- joinCountryData2Map(dataFramee, joinCode='NAME', nameJoinColumn='Countri
 mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatures per location", missingCountryCol='dark grey')
 ```
 
+```{r, message=FALSE, warning=FALSE}
+library(rworldmap)
+dataFramee <- deltatemperatures
+
+sPDF <- joinCountryData2Map(dataFramee, joinCode='NAME', nameJoinColumn='Countries')
+mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatures per location", missingCountryCol='dark grey', mapRegion = "Eurasia")
+```
 
 # 5. Conclusion
 ## 5.1. Key message
