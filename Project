@@ -317,7 +317,7 @@ $~$
 ```{r}
 a = 1
 i = 0
-countries = c("Norway", "Brazil", "South Africa", "Belgium", "Japan", "Canada", "Argentina", "Australia", "Thailand", "Peru")
+countries = c("Norway", "Brazil", "South Africa", "Austria", "Japan", "Canada", "Argentina", "Australia", "Thailand", "Peru")
 for (i in countries){
   temp <- period %>%filter(Countries %in% countries) 
   co2 <- emission_clean %>%filter(Countries %in% countries)
@@ -353,8 +353,11 @@ $~$
 ### 3.1.1 Norway
 We begin first of all with the Norway. Norway is a country situated in the North and got in average low temperatures. Thus, this is an occidental country, well-developed and industrialized. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 Norway <- df %>% filter(Countries %in% "Norway")
+Norway_scale <- Norway
+Norway_scale[, -c(1,2)] <- scale(Norway[, -c(1,2)])
+
 library(table1)
 table1::label(Norway$residents) <- "Population"
 table1::label(Norway$GDP) <- "GDP"
@@ -365,19 +368,67 @@ table1::label(Norway$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Norway, overall="Norway")
 ```
 
-```{r}
-ndf <- Norway[-c(1:5)]
-pdf <- Norway[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Norway$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Norway$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Norway$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
-``` 
+fig <- fig %>% layout(
+  title = "Norwegian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
+```
 
 #### 3.1.1.2. Correlation
 
 In order to analyse the results in Norway, we first begin by investigation the different correlation rate between the variables, and particular with regard to temperatures or the differences of temperatures. We made this in order to have a first intuition on which variables we could potentially eliminate, and which relation we should investigate more. To compute this, we use the `corrplot` function, which illustrate in a good way the best relationship:
+
 ```{r, message=FALSE, warning=FALSE}
 library(corrplot)
 Norway <- df %>% filter(Countries %in% "Norway")
@@ -386,6 +437,7 @@ corrplot.mixed(cor(Norway[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+
 Thanks to this illustration, we can see that there are approximately the same relation between the differences in temperatures and the other parameters than with the average temperature. We can see high internal correlation; for example between population and urban population, between GDP and residents or conversely a high negative relation between the number of residents and the infant deaths rate or between GDP and Infant deaths rate. According to this 1st correlation plot, we deduce tht the economic factor GDP and the social factors such as population number or the number of jobless people impacted the global warming the most. It seems quite counter-intuitive. Also, we can see that there is a better correlation between cumulated C=2 emissions and higher temperature. It seems obvious that only this years CO2 impact temperature, but also the past one.
 
 $~$
@@ -587,12 +639,54 @@ fig
 
 <font size="3"> First, as we already know, we'll have to eliminate some variable. In order to do that, we use a backward selection based on the criteria AIC to select the variable that are statistically significant. In order to do that, we use the function `step` and choose as a direction backward. We will do this several time, to see if a model considering the differences in temperature make more sense statistically than with temperature, and look at CO2 and cumulated CO2 as the dependent variable. But let's begin with the temperatures. </font>
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include = FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway)
+mynullmodel <- lm(Norway$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include = FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway)
+mynullmodel <- lm(Norway$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
 ```{r}
-model1 <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
-new_model <- lm(C ~ jobless + 
-    Deaths, data = Norway)
-model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
-new_model2 <- lm(dC ~ jobless + Deaths, data=Norway)
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
+new_model <- lm(C ~ CO2_cumulated + jobless + Deaths, data = Norway)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway)
+new_model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+We can see that our model is actually really poor, even in terms of coefficients (estimates). That's why we try to look at the linear model of the scaled values for the differential of temperatuer and raw temperatures in order to have something more significant. First, we use a backward selection based on AIC criteria to look at what will be the best model, which variable should be considered. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include =FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway_scale)
+mynullmodel <- lm(Norway_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway_scale)
+mynullmodel <- lm(Norway_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway_scale)
+new_model <- lm(C ~ jobless + Deaths, data = Norway_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Norway_scale)
+new_model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths + residents, data=Norway_scale)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -601,7 +695,7 @@ library(sjPlot)
 tab_model(model1, new_model, model2, new_model2,
           show.ci = FALSE, 
           pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
-          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
           p.style = "stars",
           file="output.html")
 ```
@@ -611,12 +705,23 @@ tab_model(model1, new_model, model2, new_model2,
 Now, we will consider the cumulated CO2 based on our model.We already saw that the relationship between cumulated CO2 and temerature was far better than with CO2. Now, we want to identify which variable explain the increase in CO2 emission, still using the backward selection.
 In this case, it adds the population to the remaining significant variables in comparisons with CO2. The model is good, and it 97% of the variation of the CO2 cumulated are explain by our model.This mean that the cumulated CO2 can be explained by the unemployment, the number of deaths and the number of inhabitants. The variable unemployed is not significant if we apply a confidence level of 5% or less, so it could be eliminated, but at what cost in term of precision ? The cost in term of Rsquared will be really small, so we decided to reduce our model to residents and deaths. What is also interesting in this model, is that there is a positive relationship between cumulated CO2 and deaths. We can interpret this by explaining that a higher pollution of the air can murder some people or increase the risk of deaths. </font>
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Norway)
+mynullmodel <- lm(Norway$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Norway)
+mynullmodel <- lm(Norway$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
 ```{r, message=FALSE, warning=FALSE}
-model5 <- lm(CO2 ~ GDP + jobless + Deaths  + residents, data=Norway)
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Norway)
 model7 <- lm(CO2 ~ jobless + Deaths, data=Norway)
 model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Norway)
-model8 <- lm(CO2_cumulated ~ Deaths + 
-    residents, data=Norway)
+model8 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Norway)
 tab_model(model5,model7, model6, model8,
           show.ci = FALSE,
           pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
@@ -625,19 +730,30 @@ tab_model(model5,model7, model6, model8,
           file="output.html")
 ```
 
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
 
-
-
-
-
-
-
-
-
-
-
-
-
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Norway_scale)
+mynullmodel <- lm(Norway_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Norway_scale)
+mynullmodel <- lm(Norway_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Norway_scale)
+model7 <- lm(CO2 ~ jobless + Deaths, data=Norway_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Norway_scale)
+model8 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Norway_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
 
 
 
@@ -658,6 +774,8 @@ Now, let's consider our second country, the Brazil. The Brazil is a big country 
 
 ```{r}
 Brazil <- df %>% filter(Countries %in% "Brazil")
+Brazil_scale <- Brazil
+Brazil_scale[, -c(1,2)] <- scale(Brazil[, -c(1,2)])
 library(table1)
 table1::label(Brazil$residents) <- "Population"
 table1::label(Brazil$GDP) <- "GDP"
@@ -668,15 +786,62 @@ table1::label(Brazil$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Brazil, overall="Brazil")
 ```
 
-```{r}
-ndf <- Brazil[-c(1:5)]
-pdf <- Brazil[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Brazil$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Brazil$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Brazil$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
-``` 
+fig <- fig %>% layout(
+  title = "Brazilian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
+```
 
 #### 3.1.2.1. Correlation
 First, let's look at the correlation in Brazil between the different country. We use the function corrplot in order to create the following icture, which is more aesthetic than raw data, and decided to add the value in the lower part. 
@@ -857,21 +1022,121 @@ fig
 ```
 
 #### 3.1.2.3. Linear Regression Model(s)
-```{r, message=FALSE, warning=FALSE}
-model <- lm(Brazil$C ~ Brazil$CO2 + Brazil$GDP + Brazil$CO2_cumulated + Brazil$jobless + Brazil$Deaths + Brazil$residents)
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Brazil)
 mynullmodel <- lm(Brazil$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Brazil)
+mynullmodel <- lm(Brazil$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
+new_model <- lm(C ~ CO2 + residents, data = Brazil)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
+new_model2 <- lm(dC ~ jobless + residents, data=Brazil)
+```
+
+                 
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Brazil_scale)
+mynullmodel <- lm(Brazil_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Brazil_scale)
+mynullmodel <- lm(Brazil_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil_scale)
+new_model <- lm(C ~ CO2 + residents, data = Brazil_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil_scale)
+new_model2 <- lm(dC ~ jobless + residents, data=Brazil_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Brazil)
+mynullmodel <- lm(Brazil$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Brazil)
+mynullmodel <- lm(Brazil$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Brazil)
+model7 <- lm(CO2 ~ Deaths + residents, data=Brazil)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Brazil)
+model8 <- lm(CO2_cumulated ~ GDP + Deaths + residents, data=Brazil)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
 
 
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Brazil_scale)
+mynullmodel <- lm(Brazil_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Brazil_scale)
+mynullmodel <- lm(Brazil_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
-
-
-
-
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Brazil_scale)
+model7 <- lm(CO2 ~ Deaths + residents, data=Brazil_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Brazil_scale)
+model8 <- lm(CO2_cumulated ~ GDP + Deaths + residents, data=Brazil_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
 
 
 
@@ -894,15 +1159,64 @@ table1::label(Canada$jobless) <- "Unemployed"
 table1::label(Canada$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Canada, overall="Canada")
 ```
-```{r}
-ndf <- Canada[-c(1:5)]
-pdf <- Canada[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
-``` 
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Canada$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Canada$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Canada$jobless, visible = FALSE)
+
+fig <- fig %>% layout(
+  title = "Canadian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
+```
+
 #### 3.1.3.1. Correlation
 ```{r, message=FALSE, warning=FALSE}
 corrplot.mixed(cor(Brazil[,-c(1, 2)]),
@@ -973,7 +1287,7 @@ ll.smooth11 = lm(Canada$jobless~Canada$dC, span=0.75)
 ll.smooth12 = lm(Canada$Deaths~Canada$dC, span=0.75)
 ll.smooth13 = lm(Canada$GDP~Canada$dC, span=0.75)
 
-fig <- plot_ly(Brazil, x =  ~Canada$dC, mode="lines", alpha = 0.65)
+fig <- plot_ly(Canada, x =  ~Canada$dC, mode="lines", alpha = 0.65)
 fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
 fig <- fig %>% add_trace(y = ~Canada$residents, name = "Population", mode = "markers")
 fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
@@ -1075,13 +1389,34 @@ fig
 
 ####3.1.3.3. Linear Regression Model(s)
 
-```{r, message=FALSE, warning=FALSE}
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
 model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada)
 mynullmodel <- lm(Canada$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada)
+mynullmodel <- lm(Canada$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
+new_model <- lm(C ~ residents, data = Brazil)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
+new_model2 <- lm(dC ~ CO2_cumulated + jobless + Deaths, data=Brazil)
+```
+
+```{r}
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
 
 
 
@@ -1107,33 +1442,262 @@ table1::label(South_Africa$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = South_Africa, overall="South Africa")
 ```
 
-```{r}
-ndf <- South_Africa[-c(1:5)]
-pdf <- South_Africa[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = South_Africa$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = South_Africa$C, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = South_Africa$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "South African Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
+
 #### 3.1.4.1. Correlation
+
 ```{r, message=FALSE, warning=FALSE}
 corrplot.mixed(cor(South_Africa[,-c(1, 2)]),
                lower = "number", 
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(South_Africa$C ~ South_Africa$CO2 + South_Africa$GDP + South_Africa$jobless + South_Africa$Deaths  + South_Africa$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " South Africa VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
 
+#### 3.1.4.2. Visualization
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(South_Africa$C~South_Africa$Years, span=0.75)
+ll.smooth2 = loess(South_Africa$CO2~South_Africa$Years, span=0.75)
+ll.smooth3 = loess(South_Africa$dC~South_Africa$Years, span=0.75)
+ll.smooth4 = loess(South_Africa$CO2_cumulated~South_Africa$Years, span=0.75)
 
+fig <- plot_ly(South_Africa, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$C, name = "Temperature", mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$CO2, name = "CO2", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$dC, name = "dC", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
 
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(South_Africa$residents~South_Africa$dC, span=0.75)
+ll.smooth11 = lm(South_Africa$jobless~South_Africa$dC, span=0.75)
+ll.smooth12 = lm(South_Africa$Deaths~South_Africa$dC, span=0.75)
+ll.smooth13 = lm(South_Africa$GDP~South_Africa$dC, span=0.75)
 
+fig <- plot_ly(South_Africa, x =  ~South_Africa$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~South_Africa$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~South_Africa$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in South Africa",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in South Africa"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(South_Africa$C~South_Africa$CO2, span=0.75)
+ll.smooth2 = lm(South_Africa$dC~South_Africa$CO2, span=0.75)
+fig <- plot_ly(South_Africa, x =  ~South_Africa$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$dC, name = "Differences of temperatures in South Africa", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in South Africa",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in South Africa"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(South_Africa$C~South_Africa$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(South_Africa$dC~South_Africa$CO2_cumulated, span=0.75)
+fig <- plot_ly(South_Africa, x =  ~South_Africa$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~South_Africa$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in South Africa",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of South Africa"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+####3.1.4.3. Linear Regression Model(s)
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=South_Africa)
+mynullmodel <- lm(South_Africa$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=South_Africa)
+mynullmodel <- lm(South_Africa$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa)
+new_model <- lm(dC ~ CO2 + CO2_cumulated + Deaths + residents, data = South_Africa)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa)
+new_model2 <- lm(dC ~ residents, data=South_Africa)
+```
+
+```{r}
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
 
 
 
@@ -1150,14 +1714,61 @@ table1::label(Peru$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Peru, overall="Peru")
 ```
 
-```{r}
-ndf <- Peru[-c(1:5)]
-pdf <- Peru[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Peru$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Peru$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Peru$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "Peruvian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
 
 #### 3.1.5.1. Correlation
@@ -1167,50 +1778,419 @@ corrplot.mixed(cor(Peru[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
-
-
-
-
-
-
-
-
-### 3.1.6. Belgium
-```{r}
-Belgium <- df %>% filter(Countries %in% "Belgium")
-library(table1)
-table1::label(Belgium$residents) <- "Population"
-table1::label(Belgium$GDP) <- "GDP"
-table1::label(Belgium$dC) <- "Temperature differential"
-table1::label(Belgium$Deaths) <- "Death"
-table1::label(Belgium$jobless) <- "Unemployed"
-table1::label(Belgium$CO2_cumulated) <- "Cumulated CO2"
-table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Belgium, overall="Belgium")
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Peru$C ~ Peru$CO2 + Peru$GDP + Peru$jobless + Peru$Deaths  + Peru$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Peru VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
 ```
 
-```{r}
-ndf <- Belgium[-c(1:5)]
-pdf <- Belgium[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+#### 3.1.5.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Peru$C~Peru$Years, span=0.75)
+ll.smooth2 = loess(Peru$CO2~Peru$Years, span=0.75)
+ll.smooth3 = loess(Peru$dC~Peru$Years, span=0.75)
+ll.smooth4 = loess(Peru$CO2_cumulated~Peru$Years, span=0.75)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- plot_ly(Peru, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Peru$residents~Peru$dC, span=0.75)
+ll.smooth11 = lm(Peru$jobless~Peru$dC, span=0.75)
+ll.smooth12 = lm(Peru$Deaths~Peru$dC, span=0.75)
+ll.smooth13 = lm(Peru$GDP~Peru$dC, span=0.75)
+
+fig <- plot_ly(Peru, x =  ~Peru$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Peru$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Peru$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Peru",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Peru"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Peru$C~Peru$CO2, span=0.75)
+ll.smooth2 = lm(Peru$dC~Peru$CO2, span=0.75)
+fig <- plot_ly(Peru, x =  ~Peru$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$dC, name = "Differences of temperatures in South Africa", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Peru",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Peru"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Peru$C~Peru$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Peru$dC~Peru$CO2_cumulated, span=0.75)
+fig <- plot_ly(Peru, x =  ~Peru$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Peru$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Peru",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Peru"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+#### 3.1.5.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Peru)
+mynullmodel <- lm(Peru$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+### 3.1.6. Austria
+```{r}
+Austria <- df %>% filter(Countries %in% "Austria")
+Austria[is.na(Austria)] = 0
+library(table1)
+table1::label(Austria$residents) <- "Population"
+table1::label(Austria$GDP) <- "GDP"
+table1::label(Austria$dC) <- "Temperature differential"
+table1::label(Austria$Deaths) <- "Death"
+table1::label(Austria$jobless) <- "Unemployed"
+table1::label(Austria$CO2_cumulated) <- "Cumulated CO2"
+table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Austria, overall="Austria")
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Austria$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Austria$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Austria$jobless, visible = FALSE)
+
+fig <- fig %>% layout(
+  title = "Austrian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
 
 #### 3.1.6.1. Correlation
 ```{r, message=FALSE, warning=FALSE}
-corrplot.mixed(cor(Belgium[,-c(1, 2)]),
+corrplot.mixed(cor(Austria[,-c(1, 2)]),
                lower = "number", 
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Austria$C ~ Austria$CO2 + Austria$GDP + Austria$jobless + Austria$Deaths  + Austria$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Austria VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
 
+#### 3.1.6.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth15 = loess(Austria$C~Austria$Years, span=0.75)
+ll.smooth16 = loess(Austria$CO2~Austria$Years, span=0.75)
+ll.smooth17 = loess(Austria$dC~Austria$Years, span=0.75)
+ll.smooth18 = loess(Austria$CO2_cumulated~Austria$Years, span=0.75)
 
+fig <- plot_ly(Austria, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth15), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$C, name = "Temperature", mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth16), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$CO2, name = "CO2", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth17), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$dC, name = "dC", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth18), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
 
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Austria$residents~Austria$dC, span=0.75)
+ll.smooth11 = lm(Austria$jobless~Austria$dC, span=0.75)
+ll.smooth12 = lm(Austria$Deaths~Austria$dC, span=0.75)
+ll.smooth13 = lm(Austria$GDP~Austria$dC, span=0.75)
+
+fig <- plot_ly(Austria, x =  ~Austria$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Austria$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Austria$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Austria",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Austria"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Austria$C~Austria$CO2, span=0.75)
+ll.smooth2 = lm(Austria$dC~Austria$CO2, span=0.75)
+fig <- plot_ly(Austria, x =  ~Austria$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$dC, name = "Differences of temperatures in Austria", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Austria",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Austria"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Austria$C~Austria$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Austria$dC~Austria$CO2_cumulated, span=0.75)
+fig <- plot_ly(Austria, x =  ~Austria$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Austria$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Austria",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Austria"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+#### 3.1.6.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Austria)
+mynullmodel <- lm(Austria$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
 
 
@@ -1231,14 +2211,61 @@ table1::label(Thailand$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Thailand, overall="Thailand")
 ```
 
-```{r}
-ndf <- Thailand[-c(1:5)]
-pdf <- Thailand[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Thailand$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Thailand$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Thailand$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "Thailandese Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
 
 #### 3.1.7.1. Correlation
@@ -1248,12 +2275,174 @@ corrplot.mixed(cor(Thailand[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Thailand$C ~ Thailand$CO2 + Thailand$GDP + Thailand$jobless + Thailand$Deaths  + Thailand$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Thailand VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
+
+#### 3.1.7.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Thailand$C~Thailand$Years, span=0.75)
+ll.smooth2 = loess(Thailand$CO2~Thailand$Years, span=0.75)
+ll.smooth3 = loess(Thailand$dC~Thailand$Years, span=0.75)
+ll.smooth4 = loess(Thailand$CO2_cumulated~Thailand$Years, span=0.75)
+
+fig <- plot_ly(Thailand, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
 
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Thailand$residents~Thailand$dC, span=0.75)
+ll.smooth11 = lm(Thailand$jobless~Thailand$dC, span=0.75)
+ll.smooth12 = lm(Thailand$Deaths~Thailand$dC, span=0.75)
+ll.smooth13 = lm(Thailand$GDP~Thailand$dC, span=0.75)
 
+fig <- plot_ly(Thailand, x =  ~Thailand$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Thailand$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Thailand$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Thailand",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Thailand"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Thailand$C~Thailand$CO2, span=0.75)
+ll.smooth2 = lm(Thailand$dC~Thailand$CO2, span=0.75)
+fig <- plot_ly(Thailand, x =  ~Thailand$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$dC, name = "Differences of temperatures in Thailand", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Thailand",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Thailand"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
 
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Thailand$C~Thailand$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Thailand$dC~Thailand$CO2_cumulated, span=0.75)
+fig <- plot_ly(Thailand, x =  ~Thailand$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Thailand$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Thailand",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Thailand"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
 
+#### 3.1.7.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Thailand)
+mynullmodel <- lm(Thailand$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
 
 
@@ -1269,15 +2458,63 @@ table1::label(Australia$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Australia, overall="Australia")
 ```
 
-```{r}
-ndf <- Australia[-c(1:5)]
-pdf <- Australia[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Australia$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Australia$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Australia$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "Australian Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
+
 #### 3.1.8.1. Correlation
 ```{r, message=FALSE, warning=FALSE}
 corrplot.mixed(cor(Australia[,-c(1, 2)]),
@@ -1285,11 +2522,173 @@ corrplot.mixed(cor(Australia[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <-lm(Australia$C ~ Australia$CO2 + Australia$GDP + Australia$jobless + Australia$Deaths  + Australia$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Australia VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
 
+#### 3.1.8.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Australia$C~Australia$Years, span=0.75)
+ll.smooth2 = loess(Australia$CO2~Australia$Years, span=0.75)
+ll.smooth3 = loess(Australia$dC~Australia$Years, span=0.75)
+ll.smooth4 = loess(Australia$CO2_cumulated~Australia$Years, span=0.75)
 
+fig <- plot_ly(Australia, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$C, name = "Temperature", mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$CO2, name = "CO2", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$dC, name = "dC", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Australia$residents~Australia$dC, span=0.75)
+ll.smooth11 = lm(Australia$jobless~Australia$dC, span=0.75)
+ll.smooth12 = lm(Australia$Deaths~Australia$dC, span=0.75)
+ll.smooth13 = lm(Australia$GDP~Australia$dC, span=0.75)
+
+fig <- plot_ly(Australia, x =  ~Australia$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Australia$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Australia$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Australia",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Australia"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Australia$C~Australia$CO2, span=0.75)
+ll.smooth2 = lm(Australia$dC~Australia$CO2, span=0.75)
+fig <- plot_ly(Australia, x =  ~Australia$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$dC, name = "Differences of temperatures in Australia", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Australia",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Australia"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Australia$C~Australia$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Australia$dC~Australia$CO2_cumulated, span=0.75)
+fig <- plot_ly(Australia, x =  ~Australia$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Australia$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Australia",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Australia"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+#### 3.1.8.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Australia)
+mynullmodel <- lm(Australia$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
 ### 3.1.9. Argentina
 
@@ -1304,15 +2703,62 @@ table1::label(Argentina$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Argentina, overall="Argentina")
 ```
 
-```{r}
-ndf <- Argentina[-c(1:5)]
-pdf <- Argentina[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Argentina$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Argentina$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Argentina$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "Argetina's Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
+
 #### 3.1.9.1. Correlation
 ```{r, message=FALSE, warning=FALSE}
 corrplot.mixed(cor(Argentina[,-c(1, 2)]),
@@ -1320,13 +2766,174 @@ corrplot.mixed(cor(Argentina[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Argentina$C ~ Argentina$CO2 + Argentina$GDP + Argentina$jobless + Argentina$Deaths  + Argentina$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Argentina VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
 
 
+#### 3.1.9.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Argentina$C~Argentina$Years, span=0.75)
+ll.smooth2 = loess(Argentina$CO2~Argentina$Years, span=0.75)
+ll.smooth3 = loess(Argentina$dC~Argentina$Years, span=0.75)
+ll.smooth4 = loess(Argentina$CO2_cumulated~Argentina$Years, span=0.75)
 
+fig <- plot_ly(Argentina, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$C, name = "Temperature", mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$CO2, name = "CO2", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$dC, name = "dC", visible = F, mode = "markers")
 
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
 
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Argentina$residents~Argentina$dC, span=0.75)
+ll.smooth11 = lm(Argentina$jobless~Argentina$dC, span=0.75)
+ll.smooth12 = lm(Argentina$Deaths~Argentina$dC, span=0.75)
+ll.smooth13 = lm(Argentina$GDP~Argentina$dC, span=0.75)
+
+fig <- plot_ly(Argentina, x =  ~Argentina$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Argentina$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Argentina$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Argentina",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Argentina"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Argentina$C~Argentina$CO2, span=0.75)
+ll.smooth2 = lm(Argentina$dC~Argentina$CO2, span=0.75)
+fig <- plot_ly(Argentina, x =  ~Argentina$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$dC, name = "Differences of temperatures in Argentina", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Argentina",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Argentina"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Argentina$C~Argentina$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Argentina$dC~Argentina$CO2_cumulated, span=0.75)
+fig <- plot_ly(Argentina, x =  ~Argentina$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Argentina$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Argentina",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Argentina"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+#### 3.1.5.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Argentina)
+mynullmodel <- lm(Argentina$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
 
 
@@ -1343,14 +2950,61 @@ table1::label(Japan$CO2_cumulated) <- "Cumulated CO2"
 table1::table1(~residents + GDP + Deaths + dC + jobless + CO2_cumulated, data = Japan, overall="Japan")
 ```
 
-```{r}
-ndf <- Japan[-c(1:5)]
-pdf <- Japan[c(3:5)] 
-par(mfrow = c(1, ncol(ndf)))
-invisible(lapply(1:ncol(ndf), function(i) boxplot(ndf[, i])))
+```{r, warning=FALSE, message=FALSE}
+library(plotly())
+fig <- plot_ly(type = "box")
+fig <- fig %>% add_trace(y = Japan$dC, visible = TRUE)
+fig <- fig %>% add_trace(y = Japan$C, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$CO2, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$CO2_cumulated, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$residents, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$Deaths, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$GDP, visible = FALSE)
+fig <- fig %>% add_trace(y = Japan$jobless, visible = FALSE)
 
-par(mfrow = c(1, ncol(pdf)))
-invisible(lapply(1:ncol(pdf), function(i) boxplot(pdf[, i])))
+fig <- fig %>% layout(
+  title = "Japanese Box Plot of each variables",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Differention of Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Cumulated CO2"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE)),
+               label = "Population"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)),
+               label = "GDP"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)),
+               label = "Unemployment")
+            )
+          )
+        )
+)
+fig
 ```
 
 #### 3.1.10.1. Correlation
@@ -1360,7 +3014,173 @@ corrplot.mixed(cor(Japan[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+```{r, message=FALSE, warning=FALSE}
+model1 <- lm(Japan$C ~ Japan$CO2 + Japan$GDP + Japan$jobless + Japan$Deaths  + Japan$residents)
+vif_values1 <- vif(model1)
+bar_plot_vif2 <- barplot(vif_values1, main = " Japan VIF Values 1", horiz = TRUE, col = "steelblue", name=c("CO2", "GD", "Job", "dea", "pop"))
+abline(v = 5, lwd = 3, lty = 2)
+```
 
+#### 3.1.10.2. Visualization
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = loess(Japan$C~Japan$Years, span=0.75)
+ll.smooth2 = loess(Japan$CO2~Japan$Years, span=0.75)
+ll.smooth3 = loess(Japan$dC~Japan$Years, span=0.75)
+ll.smooth4 = loess(Japan$CO2_cumulated~Japan$Years, span=0.75)
+
+fig <- plot_ly(Japan, x =  ~Years, mode="lines", alpha = 0.65)
+fig <- fig %>% add_lines(y = predict(ll.smooth1), name = "Temperature", alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$C, name = "Temperature", mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$CO2, name = "CO2", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth3), name = "dC", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$dC, name = "dC", visible = F, mode = "markers")
+
+fig <- fig %>% add_trace(y = predict(ll.smooth4), name = "Cumulated CO2", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$CO2_cumulated, name = "Cumulated CO2", visible = F, mode = "markers")
+
+fig <- fig %>% layout(
+  title = "Comparisons of variable based on Timeline",
+    xaxis = list(domain = c(0.1, 1)),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Temperature"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "CO2"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "ΔTemperatures"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "Cumulated CO2")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth10 = lm(Japan$residents~Japan$dC, span=0.75)
+ll.smooth11 = lm(Japan$jobless~Japan$dC, span=0.75)
+ll.smooth12 = lm(Japan$Deaths~Japan$dC, span=0.75)
+ll.smooth13 = lm(Japan$GDP~Japan$dC, span=0.75)
+
+fig <- plot_ly(Japan, x =  ~Japan$dC, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth10), name = "Population", alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$residents, name = "Population", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth11), name = "Number of unemployed people", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$jobless, name = "Number of unemployed people", visible = F, mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth12), name = "Number of deaths", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Japan$Deaths, name = "Number of deaths", mode = "markers", visible = F)
+fig <- fig %>% add_trace(y = predict(ll.smooth13), name = "GDP", alpha=1, visible = F)
+fig <- fig %>% add_trace(y = ~Japan$GDP, name = "GDP", mode = "markers", visible = F)
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Japan",
+    xaxis = list(domain = c(0.1, 1), title = "Difference of Temperature in Japan"),
+    yaxis = list(title = "variable"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)),
+                label = "Population"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)),
+               label = "Unemployed"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)),
+               label = "Deaths"),
+            
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)),
+               label = "GDP")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Japan$C~Japan$CO2, span=0.75)
+ll.smooth2 = lm(Japan$dC~Japan$CO2, span=0.75)
+fig <- plot_ly(Japan, x =  ~Japan$CO2, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$dC, name = "Differences of temperatures in Japan", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variation based on CO2 in Japan",
+    xaxis = list(domain = c(0.1, 1), title = "CO2 emission in Japan"),
+    yaxis = list(title = "°C"),
+    updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+```{r, message=FALSE, warning=FALSE}
+ll.smooth1 = lm(Japan$C~Japan$CO2_cumulated, span=0.75)
+ll.smooth2 = lm(Japan$dC~Japan$CO2_cumulated, span=0.75)
+fig <- plot_ly(Japan, x =  ~Japan$CO2_cumulated, mode="lines", alpha = 0.65)
+fig <- fig %>% add_trace(y = predict(ll.smooth1), name = "Temperatures", alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$C, name = "Temperatures", mode = "markers")
+fig <- fig %>% add_trace(y = predict(ll.smooth2), name = "Differences of temperatures", visible = F, alpha=1)
+fig <- fig %>% add_trace(y = ~Japan$dC, name = "Differences of temperatures", visible = F, mode = "markers")
+fig <- fig %>% layout(
+  title = "Temperature variaton based on cumulated CO2 in Japan",
+    xaxis = list(domain = c(0.1, 1), title = "Cumulated CO2 emissions of Japan"),
+    yaxis = list(title = "°C"),
+  updatemenus = list(
+        list(
+          y = 0.8,
+          buttons = list(
+            list(method = "restyle",
+                args = list("visible", list(TRUE, TRUE, FALSE, FALSE)),
+                label = "Temperature"),
+          
+            list(method = "restyle",
+               args = list("visible", list(FALSE, FALSE, TRUE, TRUE)),
+               label = "ΔTemperatures")
+            )
+          )
+        )
+)
+fig
+```
+
+####3.1.10.3. Linear Regression Model(s)
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Japan)
+mynullmodel <- lm(Japan$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
 
 ## 3.2. International Comparisons and Analysi
 ```{r}
@@ -1459,4 +3279,5 @@ mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatu
 ## 5.1. Key message
 ## 5.2. Limitations
 ## 5.3. Future Work
+
 
