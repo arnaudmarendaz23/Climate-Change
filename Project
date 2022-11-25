@@ -1023,7 +1023,7 @@ fig
 
 #### 3.1.2.3. Linear Regression Model(s)
 
-```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
 model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Brazil)
 mynullmodel <- lm(Brazil$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
@@ -1148,8 +1148,10 @@ tab_model(model5,model7, model6, model8,
 
 ### 3.1.3. Canada
 
-```{r}
+```{r, fig.align = 'center'}
 Canada <- df %>% filter(Countries %in% "Canada")
+Canada_scale <- Canada
+Canada_scale[, -c(1,2)] <- scale(Canada[, -c(1,2)])
 library(table1)
 table1::label(Canada$residents) <- "Population"
 table1::label(Canada$GDP) <- "GDP"
@@ -1389,32 +1391,121 @@ fig
 
 ####3.1.3.3. Linear Regression Model(s)
 
-
-```{r, message=FALSE, warning=FALSE, echo=TRUE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
 model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada)
 mynullmodel <- lm(Canada$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
-```{r, message=FALSE, warning=FALSE, echo=TRUE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
 model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada)
 mynullmodel <- lm(Canada$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
 ```{r}
-model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
-new_model <- lm(C ~ residents, data = Brazil)
-model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Brazil)
-new_model2 <- lm(dC ~ CO2_cumulated + jobless + Deaths, data=Brazil)
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Canada)
+new_model <- lm(C ~residents, data = Canada)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Canada)
+new_model2 <- lm(dC ~ CO2_cumulated + jobless + Deaths, data=Canada)
 ```
 
 ```{r}
+library(sjPlot)
 tab_model(model1, new_model, model2, new_model2,
           show.ci = FALSE, 
           pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
           dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
           p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada_scale)
+mynullmodel <- lm(Canada_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada_scale)
+mynullmodel <- lm(Canada_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Canada_scale)
+new_model <- lm(C ~ residents, data = Canada_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Canada_scale)
+new_model2 <- lm(dC ~ CO2_cumulated + jobless + Deaths, data=Canada_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Canada)
+mynullmodel <- lm(Canada$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Canada)
+mynullmodel <- lm(Canada$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Canada)
+model7 <- lm(CO2 ~ jobless + Deaths, data=Canada)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Canada)
+model8 <- lm(CO2_cumulated ~ Deaths + residents, data=Canada)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Canada_scale)
+mynullmodel <- lm(Canada_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Canada_scale)
+mynullmodel <- lm(Canada_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Canada_scale)
+model7 <- lm(CO2 ~ jobless + Deaths + residents, data=Canada_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Canada_scale)
+model8 <- lm(CO2_cumulated ~ GDP + Deaths + residents, data=Canada_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
           file="output.html")
 ```
 
@@ -1433,6 +1524,8 @@ tab_model(model1, new_model, model2, new_model2,
 
 ```{r}
 South_Africa <- df %>% filter(Countries %in% "South Africa")
+South_Africa_scale <- South_Africa
+South_Africa_scale[, -c(1,2)] <- scale(South_Africa[, -c(1,2)])
 table1::label(South_Africa$residents) <- "Population"
 table1::label(South_Africa$GDP) <- "GDP"
 table1::label(South_Africa$dC) <- "Temperature differential"
@@ -1671,13 +1764,13 @@ fig
 
 ####3.1.4.3. Linear Regression Model(s)
 
-```{r, message=FALSE, warning=FALSE, echo=TRUE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
 model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=South_Africa)
 mynullmodel <- lm(South_Africa$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
-```{r, message=FALSE, warning=FALSE, echo=TRUE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
 model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=South_Africa)
 mynullmodel <- lm(South_Africa$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
@@ -1685,17 +1778,105 @@ step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 
 ```{r}
 model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa)
-new_model <- lm(dC ~ CO2 + CO2_cumulated + Deaths + residents, data = South_Africa)
+new_model <- lm(C ~CO2 + CO2_cumulated + Deaths + residents, data = South_Africa)
 model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa)
 new_model2 <- lm(dC ~ residents, data=South_Africa)
 ```
 
 ```{r}
+library(sjPlot)
 tab_model(model1, new_model, model2, new_model2,
           show.ci = FALSE, 
           pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
           dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
           p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Canada_scale)
+mynullmodel <- lm(Canada_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=South_Africa_scale)
+mynullmodel <- lm(South_Africa_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa_scale)
+new_model <- lm(C ~ residents, data = South_Africa_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=South_Africa_scale)
+new_model2 <- lm(dC ~ residents, data=South_Africa_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=South_Africa)
+mynullmodel <- lm(South_Africa$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data= South_Africa)
+mynullmodel <- lm(South_Africa$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=South_Africa)
+model7 <- lm(CO2 ~ GDP + residents, data=South_Africa)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=South_Africa)
+model8 <- lm(CO2_cumulated ~ Deaths + residents, data=South_Africa)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=South_Africa_scale)
+mynullmodel <- lm(South_Africa_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=South_Africa_scale)
+mynullmodel <- lm(South_Africa_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=South_Africa_scale)
+model7 <- lm(CO2 ~ GDP + residents, data=South_Africa_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=South_Africa_scale)
+model8 <- lm(CO2_cumulated ~ GDP + jobless + residents, data=South_Africa_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
           file="output.html")
 ```
 
@@ -1705,6 +1886,8 @@ tab_model(model1, new_model, model2, new_model2,
 ### 3.1.5. Peru
 ```{r}
 Peru <- df %>% filter(Countries %in% "Peru")
+Peru_scale <- Peru
+Peru_scale[, -c(1,2)] <- scale(Peru[, -c(1,2)])
 table1::label(Peru$residents) <- "Population"
 table1::label(Peru$GDP) <- "GDP"
 table1::label(Peru$dC) <- "Temperature differential"
@@ -1940,15 +2123,132 @@ fig
 ```
 
 #### 3.1.5.3. Linear Regression Model(s)
+
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Peru)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Peru)
 mynullmodel <- lm(Peru$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ```
 
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Peru)
+mynullmodel <- lm(Peru$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Peru)
+new_model <- lm(C ~ GDP + residents, data = Peru)
+model2 <- lm(dC ~ CO2 + CO2_cumulated, data=Peru)
+new_model2 <- lm(dC ~ CO2 + GDP + jobless + Deaths + residents, data=Peru)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Peru_scale)
+mynullmodel <- lm(Peru_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Peru_scale)
+mynullmodel <- lm(Peru_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Peru_scale)
+new_model <- lm(C ~ GDP + residents, data = Peru_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Peru_scale)
+new_model2 <- lm(dC ~  CO2 + CO2_cumulated, data=Peru_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru)
+mynullmodel <- lm(Peru$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Peru)
+mynullmodel <- lm(Peru$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru)
+model7 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Peru)
+model8 <- lm(CO2_cumulated ~ Deaths + residents, data=Peru)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru_scale)
+mynullmodel <- lm(Peru_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Peru_scale)
+mynullmodel <- lm(Peru_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru_scale)
+model7 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Peru_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Peru_scale)
+model8 <- lm(CO2_cumulated ~ GDP + jobless + residents, data=Peru_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+
+
 ### 3.1.6. Austria
 ```{r}
 Austria <- df %>% filter(Countries %in% "Austria")
+Austria_scale <- Austria
+Austria_scale[, -c(1,2)] <- scale(Austria[, -c(1,2)])
 Austria[is.na(Austria)] = 0
 library(table1)
 table1::label(Austria$residents) <- "Population"
@@ -2187,9 +2487,121 @@ fig
 
 #### 3.1.6.3. Linear Regression Model(s)
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Austria)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Austria)
 mynullmodel <- lm(Austria$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Austria)
+mynullmodel <- lm(Austria$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Austria)
+new_model <- lm(C ~ CO2 + GDP + jobless + Deaths + residents, data = Austria)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Austria)
+new_model2 <- lm(dC ~ CO2 + GDP + jobless + Deaths + residents, data=Austria)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Austria_scale)
+mynullmodel <- lm(Austria_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Austria_scale)
+mynullmodel <- lm(Austria_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Austria_scale)
+new_model <- lm(C ~ CO2 + GDP + jobless + Deaths + residents, data = Austria_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Austria_scale)
+new_model2 <- lm(dC ~ CO2 + GDP + jobless + Deaths + residents, data=Austria_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Austria)
+mynullmodel <- lm(Austria$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Austria)
+mynullmodel <- lm(Austria$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Austria)
+model7 <- lm(CO2 ~ GDP + Deaths + residents, data=Austria)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Austria)
+model8 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Austria)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Austria_scale)
+mynullmodel <- lm(Austria_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Austria_scale)
+mynullmodel <- lm(Austria_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Canada_scale)
+model7 <- lm(CO2 ~ GDP + Deaths + residents, data=Canada_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Canada_scale)
+model8 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Canada_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
 
 
@@ -2202,6 +2614,8 @@ step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ### 3.1.7. Thailand
 ```{r}
 Thailand <- df %>% filter(Countries %in% "Thailand")
+Thailand_scale <- Thailand
+Thailand_scale[, -c(1,2)] <- scale(Thailand[, -c(1,2)])
 table1::label(Thailand$residents) <- "Population"
 table1::label(Thailand$GDP) <- "GDP"
 table1::label(Thailand$dC) <- "Temperature differential"
@@ -2439,9 +2853,121 @@ fig
 
 #### 3.1.7.3. Linear Regression Model(s)
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Thailand)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Thailand)
 mynullmodel <- lm(Thailand$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Thailand)
+mynullmodel <- lm(Thailand$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Thailand)
+new_model <- lm(C ~ GDP + CO2_cumulated, data = Thailand)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Thailand)
+new_model2 <- lm(dC ~ CO2 + jobless, data=Thailand)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Thailand_scale)
+mynullmodel <- lm(Thailand_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Thailand_scale)
+mynullmodel <- lm(Thailand_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Thailand_scale)
+new_model <- lm(C ~GDP + CO2_cumulated, data = Thailand_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Thailand_scale)
+new_model2 <- lm(dC ~ CO2 + jobless, data=Thailand_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Thailand)
+mynullmodel <- lm(Thailand$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Thailand)
+mynullmodel <- lm(Thailand$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Thailand)
+model7 <- lm(CO2 ~ jobless + Deaths + residents, data=Thailand)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Thailand)
+model8 <- lm(CO2_cumulated ~ Deaths + residents, data=Thailand)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Thailand_scale)
+mynullmodel <- lm(Thailand_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Thailand_scale)
+mynullmodel <- lm(Thailand_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Thailand_scale)
+model7 <- lm(CO2 ~ jobless + Deaths + residents, data=Thailand_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Thailand_scale)
+model8 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Thailand_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
 
 
@@ -2449,6 +2975,8 @@ step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ### 3.1.8. Australia
 ```{r}
 Australia <- df %>% filter(Countries %in% "Australia")
+Australia_scale <- Australia
+Australia_scale[, -c(1,2)] <- scale(Australia[, -c(1,2)])
 table1::label(Australia$residents) <- "Population"
 table1::label(Australia$GDP) <- "GDP"
 table1::label(Australia$dC) <- "Temperature differential"
@@ -2684,16 +3212,131 @@ fig
 ```
 
 #### 3.1.8.3. Linear Regression Model(s)
+
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Australia)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Australia)
 mynullmodel <- lm(Australia$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Australia)
+mynullmodel <- lm(Australia$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Australia)
+new_model <- lm(C ~ CO2 + residents, data = Australia)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Australia)
+new_model2 <- lm(dC ~ Deaths + residents, data = Australia)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Australia_scale)
+mynullmodel <- lm(Australia_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Australia_scale)
+mynullmodel <- lm(Australia_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Australia_scale)
+new_model <- lm(C ~CO2 + residents, data = Australia_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Australia_scale)
+new_model2 <- lm(dC ~ Deaths + residents, data=Australia_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Australia)
+mynullmodel <- lm(Australia$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Australia)
+mynullmodel <- lm(Australia$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Australia)
+model7 <- lm(CO2 ~ GDP + Deaths + residents, data = Australia)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Australia)
+model8 <- lm(CO2_cumulated ~ residents, data = Australia)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Australia_scale)
+mynullmodel <- lm(Australia_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Australia_scale)
+mynullmodel <- lm(Australia_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Australia_scale)
+model7 <- lm(CO2 ~ GDP + Deaths + residents, data = Australia_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Australia_scale)
+model8 <- lm(CO2_cumulated ~  GDP + jobless + residents, data = Australia_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
 
 ### 3.1.9. Argentina
 
 ```{r}
 Argentina <- df %>% filter(Countries %in% "Argentina")
+Argentina_scale <- Argentina
+Argentina_scale[, -c(1,2)] <- scale(Argentina[, -c(1,2)])
 table1::label(Argentina$residents) <- "Population"
 table1::label(Argentina$GDP) <- "GDP"
 table1::label(Argentina$dC) <- "Temperature differential"
@@ -2766,6 +3409,7 @@ corrplot.mixed(cor(Argentina[,-c(1, 2)]),
                upper = "circle",
                tl.col = "black")
 ```
+
 ```{r, message=FALSE, warning=FALSE}
 model1 <- lm(Argentina$C ~ Argentina$CO2 + Argentina$GDP + Argentina$jobless + Argentina$Deaths  + Argentina$residents)
 vif_values1 <- vif(model1)
@@ -2929,10 +3573,123 @@ fig
 ```
 
 #### 3.1.5.3. Linear Regression Model(s)
+
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Argentina)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Argentina)
 mynullmodel <- lm(Argentina$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Argentina)
+mynullmodel <- lm(Argentina$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Argentina)
+new_model <- lm(C ~ GDP + Deaths + residents, data = Argentina)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Argentina)
+new_model2 <- lm(dC ~ CO2_cumulated, data = Argentina)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Argentina_scale)
+mynullmodel <- lm(Argentina_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Argentina_scale)
+mynullmodel <- lm(Argentina_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Argentina_scale)
+new_model <- lm(C ~GDP + Deaths + residents, data = Argentina_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Argentina_scale)
+new_model2 <- lm(dC ~ CO2_cumulated, data = Argentina_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Argentina)
+mynullmodel <- lm(Argentina$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Argentina)
+mynullmodel <- lm(Argentina$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Argentina)
+model7 <- lm(CO2 ~  GDP + jobless + Deaths + residents, data = Argentina)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Argentina)
+model8 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data = Argentina)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Argentina_scale)
+mynullmodel <- lm(Argentina_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Argentina_scale)
+mynullmodel <- lm(Argentina_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Argentina_scale)
+model7 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data = Argentina_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Argentina_scale)
+model8 <- lm(CO2_cumulated ~  GDP + jobless + Deaths + residents, data = Argentina_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
 
 
@@ -2941,6 +3698,8 @@ step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
 ### 3.1.10. Japan
 ```{r}
 Japan <- df %>% filter(Countries %in% "Japan")
+Japan_scale <- Japan
+Japan_scale[, -c(1,2)] <- scale(Japan[, -c(1,2)])
 table1::label(Japan$residents) <- "Population"
 table1::label(Japan$GDP) <- "GDP"
 table1::label(Japan$dC) <- "Temperature differential"
@@ -3176,10 +3935,123 @@ fig
 ```
 
 ####3.1.10.3. Linear Regression Model(s)
+
 ```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
-model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data= Japan)
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Japan)
 mynullmodel <- lm(Japan$C~1)
 step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Japan)
+mynullmodel <- lm(Japan$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r}
+model1 <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Japan)
+new_model <- lm(C ~ GDP + CO2_cumulated + Deaths + residents, data = Japan)
+model2 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths  + residents, data=Japan)
+new_model2 <- lm(dC ~ CO2 + CO2_cumulated, data = Japan)
+```
+
+```{r}
+library(sjPlot)
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Temperature in fonction of different variables", "Temperature reduced model", "Differences of Temperature", "Difference of Temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+ 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model <- lm(C ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Japan_scale)
+mynullmodel <- lm(Japan_scale$C~1)
+step(model, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model10 <- lm(dC ~ CO2 + GDP + CO2_cumulated + jobless + Deaths + residents, data=Japan_scale)
+mynullmodel <- lm(Japan_scale$C~1)
+step(model10, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r}
+model1_scale <- lm(C ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Japan_scale)
+new_model <- lm(C ~GDP + CO2_cumulated + Deaths + residents, data = Japan_scale)
+model2 <- lm(dC ~ GDP + CO2_cumulated + jobless + Deaths  + residents, data=Japan_scale)
+new_model2 <- lm(dC ~ CO2 + CO2_cumulated, data = Japan_scale)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(sjPlot)
+
+tab_model(model1, new_model, model2, new_model2,
+          show.ci = FALSE, 
+          pred.labels = c("Intecept", "CO2 emissions", "GDP", "cumulated CO2", "Number of unemployed", "Number of Deaths", "Population"), 
+          dv.labels = c("Scaled temperature in fonction of different variables", "Scaled temperature reduced model", "Scaled differences of temperature", "Scaled difference of temperature reduced model"),
+          p.style = "stars",
+          file="output.html")
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Japan)
+mynullmodel <- lm(Japan$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data=Japan)
+mynullmodel <- lm(Japan$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Japan)
+model7 <- lm(CO2 ~  GDP + residents, data = Japan)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Japan)
+model8 <- lm(CO2_cumulated ~ jobless + Deaths + residents, data = Japan)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Emission relative to variables", "Emissions reduced model", "Cumulative Emissions", "Cumulative Emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
+```
+
+If we look at the coefficients (estimates), we can see the the value are not significant. That's why we now look at the scaled values, if it changes the models and the values. 
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Japan_scale)
+mynullmodel <- lm(Japan_scale$CO2~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=TRUE, include=FALSE}
+model5 <- lm(CO2_cumulated ~ GDP + jobless + Deaths + residents, data=Japan_scale)
+mynullmodel <- lm(Japan_scale$CO2_cumulated~1)
+step(model5, scope=list(lower=mynullmodel, upper=model), direction="backward")
+```
+
+```{r, message=FALSE, warning=FALSE}
+model5 <- lm(CO2 ~ GDP + jobless + Deaths + residents, data=Japan_scale)
+model7 <- lm(CO2 ~ GDP + residents, data = Japan_scale)
+model6 <- lm(CO2_cumulated ~ GDP + jobless + Deaths  + residents, data=Japan_scale)
+model8 <- lm(CO2_cumulated ~  jobless + Deaths + residents, data = Japan_scale)
+tab_model(model5,model7, model6, model8,
+          show.ci = FALSE,
+          pred.labels = c("Intecept", "GDP", "Number of unemployed", "Number of Deaths", "Population"),
+          dv.labels = c("Scaled emission relative to variables", "Scaled emissions reduced model", "Scaled cumulative emissions", "Scaled cumulative emissions reduced model"),
+           p.style = "stars",
+          file="output.html")
 ```
 
 ## 3.2. International Comparisons and Analysi
@@ -3279,5 +4151,4 @@ mapCountryData(sPDF, nameColumnToPlot='dC', mapTitle = "Differences in Temperatu
 ## 5.1. Key message
 ## 5.2. Limitations
 ## 5.3. Future Work
-
 
